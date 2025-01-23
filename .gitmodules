@@ -1,0 +1,9 @@
+[submodule "Mage/3rd_party/spdlog"]
+	path = Mage/3rd_party/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "Mage/3rd_party/SDL"]
+	path = Mage/3rd_party/SDL
+	url = https://github.com/libsdl-org/SDL
+[submodule "Mage/3rd_party/freetype"]
+	path = Mage/3rd_party/freetype
+	url = https://github.com/freetype/freetype
