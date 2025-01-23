@@ -6,4 +6,8 @@ namespace Mage {
 
     class Window ;
 
+    class EventManager
+    {
+
+    };
 }

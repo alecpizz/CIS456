@@ -7,5 +7,8 @@
 namespace Mage {
 
     class SystemList ;
+    class SystemManager
+    {
 
+    };
 }

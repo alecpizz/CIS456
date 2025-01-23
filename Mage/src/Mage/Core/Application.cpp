@@ -28,8 +28,12 @@ namespace Mage
     {
         std::unique_ptr<Window> window;
         std::unique_ptr<EntityManager> entity_manager;
-
-        //finish for ComponentManager, SystemManager, EventManager, TextRenderer, SpriteRenderer, ShapeRenderer
+        std::unique_ptr<ComponentManager> component_manager;
+        std::unique_ptr<SystemManager> system_manager;
+        std::unique_ptr<EventManager> event_manager;
+        std::unique_ptr<TextRenderer> text_renderer;
+        std::unique_ptr<SpriteRenderer> sprite_renderer;
+        std::unique_ptr<ShapeRenderer> shape_renderer;
         bool closing = false;
     };
 
@@ -55,7 +59,35 @@ namespace Mage
         return _impl->entity_manager.get();
     }
 
-    //finish for ComponentManager, SystemManager, EventManager, TextRenderer, SpriteRenderer, ShapeRenderer
+    SystemManager *Application::get_system_manager() const
+    {
+        return _impl->system_manager.get();
+    }
+
+    ComponentManager *Application::get_component_manager() const
+    {
+        return _impl->component_manager.get();
+    }
+
+    EventManager *Application::get_event_manager() const
+    {
+        return _impl->event_manager.get();
+    }
+
+    TextRenderer *Application::get_text_renderer() const
+    {
+        return _impl->text_renderer.get();
+    }
+
+    SpriteRenderer *Application::get_sprite_renderer() const
+    {
+        return _impl->sprite_renderer.get();
+    }
+
+    ShapeRenderer *Application::get_shape_renderer() const
+    {
+        return _impl->shape_renderer.get();
+    }
 
     void Application::close()
     {
@@ -80,4 +112,5 @@ namespace Mage
             // present the window
         }
     }
+
 }

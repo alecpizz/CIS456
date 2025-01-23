@@ -14,5 +14,8 @@ namespace Mage {
     //  instantiations can be created for it in the client executable.
     // Doing it this way allows the Application object to "own" the ComponentManager
     //  as it does the other *Manager classes.
+    class MAGE_API ComponentManager
+    {
 
+    };
 }

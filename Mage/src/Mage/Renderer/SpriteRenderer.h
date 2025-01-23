@@ -7,4 +7,8 @@
 
 namespace Mage {
 
+    class SpriteRenderer
+    {
+
+    };
 }
