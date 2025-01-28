@@ -7,7 +7,7 @@
 
 namespace Mage {
 
-    class SpriteRenderer
+    class MAGE_API SpriteRenderer
     {
 
     };

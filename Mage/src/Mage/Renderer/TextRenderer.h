@@ -6,7 +6,7 @@
 
 namespace Mage {
 
-    class TextRenderer
+    class MAGE_API TextRenderer
     {
 
     };

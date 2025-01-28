@@ -4,6 +4,10 @@
 #include "../Core/Core.h"
 #include "Entity.h"
 
-namespace Mage {
+namespace Mage
+{
+    class MAGE_API EntityList
+    {
 
+    };
 }

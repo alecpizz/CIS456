@@ -7,7 +7,7 @@
 
 namespace Mage {
 
-    class ShapeRenderer
+    class MAGE_API ShapeRenderer
     {
 
     };
