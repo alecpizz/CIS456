@@ -33,7 +33,6 @@ namespace Mage
 
     EntityList System::get_entities() const
     {
-        //TODO: construct the entity list from our vector.
-        return EntityList();
+        return {_impl->entities.data(), _impl->entities.size()};
     }
 }

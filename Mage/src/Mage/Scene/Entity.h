@@ -6,7 +6,7 @@ namespace Mage
 {
     class MAGE_API Entity
     {
-        friend EntityManager;
+        friend class EntityManager;
     public:
         ~Entity()
         {

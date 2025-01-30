@@ -53,14 +53,12 @@ namespace Mage
 
     EntityList EntityManager::get_all_entities() const
     {
-        //TODO: implementation
-        return EntityList();
+        return {_impl->all_entity_ptrs.data(), _impl->all_entity_ptrs.size()};
     }
 
-    EntityList EntityManager::get_all_entities_by_type(uint32_t ) const
+    EntityList EntityManager::get_all_entities_by_type(uint32_t type) const
     {
-        //TODO: implementation
-        return EntityList();
+        return {_impl->entity_type_map[type].data(), _impl->entity_type_map[type].size()};
     }
 
     void EntityManager::update()
