@@ -69,26 +69,55 @@ namespace Mage
         /*************************************/
         //move pending additions into use
 
-        //   loop thur pending entity additions
-        //      push entity into all entities
-        //      push entity ptr into all entity ptrs
-        //      push entity ptr into entity type map
-        //   clear list of pending entity additions
+        for (auto &e: _impl->pending_entity_additions)
+        {
+            auto pe = e.get();
+            _impl->all_entities.push_back(std::move(e));
+            _impl->all_entity_ptrs.push_back(pe);
+            _impl->entity_type_map[pe->get_type()].push_back(pe);
+        }
+
+        _impl->pending_entity_additions.clear();
         /***********************************************/
 
 
         /****************************************/
         //move pending deletions from use
 
-        //  erase/remove idiom (using remove_if) for all entities in entity ptrs that are marked destroyed
-        // loop thru types in entity map
-        //  erase/remove idiom (using remove_if) for all entities in entity type map
+        //clear out ptrs
+        auto new_end = std::remove_if(_impl->all_entity_ptrs.begin(), _impl->all_entity_ptrs.end(), [](const Entity *e)
+        {
+            return e->is_destroyed();
+        });
+        _impl->all_entity_ptrs.erase(new_end, _impl->all_entity_ptrs.end());
 
-        //loop thru entities in all entities
-        //  if entity is destroyed, tell system manager about it, tell component manager about it,
-        //  and finally erase/remove idiom (using remove_if) for all entities in entity list
-        //  that are marked destroyed
+        //clear out type map
+        for (auto &t: _impl->entity_type_map)
+        {
+            auto new_end2 = std::remove_if(t.second.begin(), t.second.end(), [](const Entity *e)
+            {
+                return e->is_destroyed();
+            });
+            t.second.erase(new_end2, t.second.end());
+        }
 
+        //notify managers
+        for (auto &e: _impl->all_entities)
+        {
+            if (e->is_destroyed())
+            {
+                //TODO: tell system manager that entity was destroyed
+                //TODO: Tell component manager that entity was destroyed
+            }
+        }
+
+        auto new_end3 = std::remove_if(_impl->all_entities.begin(),
+                                       _impl->all_entities.end(),
+                                       [](const std::unique_ptr<Entity> &e)
+                                       {
+                                           return e->is_destroyed();
+                                       });
+        _impl->all_entities.erase(new_end3, _impl->all_entities.end());
         /****************************************/
     }
 }
