@@ -35,16 +35,15 @@ namespace Mage
             LOG_E_INFO("System '%s' registered.", typeid(system).name());
             if (is_system_registered(system))
             {
-                //TODO: throw exceptions
-                LOG_E_ERROR("System is already registered!");
+                throw Exception("Attempting to register a system that has already been registered is not allowed!");
             }
             register_system_internal(system);
-            auto system_id = get_system_id(std::type_index(typeid(system)));
+            auto system_id = get_system_id(std::type_index(typeid(system)).hash_code());
 
             //how the fuck
             //TODO: uncomment this when done with component manager
 //            (void) std::initializer_list<int>{
-//                    (add_system_component(system_id, get_component_manager().get_component_id<Ts>()), void(), 0)...};
+//                    (add_system_component(system_id, get_component_manager().get_component_id<Ts>()), 0)...};
         }
 
     private:
@@ -53,17 +52,19 @@ namespace Mage
 
         SystemManager();
 
+        //these next 4 are only used by sts manager, but not friend classes. but still need to be in header
+        //but not in impl due to register_system above referencing them
         ComponentManager &get_component_manager() const;
 
         void set_component_manager(ComponentManager &componentManager);
 
-        uint32_t get_system_id(std::type_index type_idx) const;
-
-        SystemList get_all_systems() const;
-
         bool is_system_registered(const System &system);
 
+        uint32_t get_system_id(size_t type_idx) const;
+
         void register_system_internal(System &system);
+
+        SystemList get_all_systems() const;
 
         void add_system_component(uint32_t system_id, uint32_t component_id);
 
