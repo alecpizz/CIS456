@@ -66,11 +66,11 @@ namespace Mage
             _index_to_entity_map.insert_or_assign(_components.size() - 1, eid);
         }
 
-        void remove(const Entity& entity)
+        void remove(const Entity &entity)
         {
             auto eid = entity.get_id();
 
-            if(!_entity_to_index_map.contains(eid))
+            if (!_entity_to_index_map.contains(eid))
             {
                 return;
             }
@@ -88,7 +88,25 @@ namespace Mage
             _entity_to_index_map[entity_id_of_arbitrary_other_component] = idx_of_arbitrary_other_component;
             _index_to_entity_map[idx_of_arbitrary_other_component] = entity_id_of_arbitrary_other_component;
 
-            
+            // remove the now incorrect entries
+            _entity_to_index_map.erase(eid);
+            _index_to_entity_map.erase(idx_of_last_component);
+
+            // remove the entity from the list of entities this vector has components for
+            _entities.erase(std::remove(_entities.begin(), _entities.end(), &entity));
+
+            // remove the last component of the vector
+            _components.erase(_components.end() - 1, _components.end());
+        }
+
+        void entity_destroyed(Entity &entity) override
+        {
+            remove(entity);
+        }
+
+        EntityList get_entities() override
+        {
+            return {_entities.data(), _entities.size()};
         }
 
     private:
