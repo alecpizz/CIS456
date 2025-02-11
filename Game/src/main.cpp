@@ -3,9 +3,8 @@
 int go()
 {
     LOG_INFO("Game started");
-
-
-
+    Game game;
+    game.run();
     LOG_INFO("Game ended");
     return 0;
 }

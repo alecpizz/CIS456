@@ -15,3 +15,8 @@
 #include "EnemySpawningSystem.h"
 #include "SpriteRenderingSystem.h"
 
+class Game : public Mage::Application
+{
+public:
+    Game();
+};

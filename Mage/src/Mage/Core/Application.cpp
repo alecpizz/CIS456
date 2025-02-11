@@ -35,17 +35,47 @@ namespace Mage
         std::unique_ptr<SpriteRenderer> sprite_renderer;
         std::unique_ptr<ShapeRenderer> shape_renderer;
         bool closing = false;
+
+        void construct(const char *title, bool full_screen = true,
+                       uint32_t w = 0, uint32_t h = 0, uint8_t swap_interval = 0)
+        {
+            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) < 0)
+            {
+                throw Exception((std::string("Failed to initialize SDL: ") + SDL_GetError()).c_str());
+            }
+
+            window = std::unique_ptr<Window>(new Window(title, full_screen, w, h, swap_interval));
+
+            entity_manager = std::unique_ptr<EntityManager>(new EntityManager());
+            system_manager = std::unique_ptr<SystemManager>(new SystemManager());
+            component_manager = std::unique_ptr<ComponentManager>(new ComponentManager());
+            //TODO: initialize event manager, text renderer, sprite renderer, shape renderer
+
+            component_manager->set_system_manager(*system_manager);
+            entity_manager->set_system_manager(*system_manager);
+            system_manager->set_component_manager(*component_manager);
+            entity_manager->set_component_manager(*component_manager);
+        }
     };
 
-    Application::Application()
+    Application::Application(const char *title, uint8_t swap_interval)
     {
-        LOG_E_INFO("Application Starting");
+        LOG_E_INFO("Application Starting (in full screen mode)");
         _impl = new Impl();
+        _impl->construct(title, true, 0, 0, swap_interval);
+    }
+
+    Application::Application(const char *title, uint32_t width, uint32_t height, uint8_t swap_interval)
+    {
+        LOG_E_INFO("Application Starting (in windowed mode)");
+        _impl = new Impl();
+        _impl->construct(title, false, width, height, swap_interval);
     }
 
     Application::~Application()
     {
         LOG_E_INFO("Application Stopping");
+        SDL_Quit();
         delete _impl;
     }
 
@@ -102,15 +132,19 @@ namespace Mage
 
         while (!_impl->closing)
         {
-            // update entity manager
+            _impl->entity_manager->update();
             // poll events
             // clear window
 
-            //for each system
-            //  call update on system (using deltaTime)
-
+            for(auto s : _impl->system_manager->get_all_systems())
+            {
+                s->update(*_impl->component_manager, et.elapsed);
+            }
             // present the window
+            et.update();
         }
     }
+
+
 
 }
