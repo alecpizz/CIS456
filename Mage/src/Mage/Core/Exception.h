@@ -11,13 +11,13 @@ namespace Mage
 
         ~Exception();
 
-        Exception(Exception &&) = delete;
+        Exception(Exception &&) noexcept;
 
-        Exception(const Exception &) = delete;
+        Exception(const Exception &);
 
-        Exception &operator=(Exception &&) = delete;
+        Exception &operator=(Exception &&) noexcept ;
 
-        Exception &operator=(const Exception &) = delete;
+        Exception &operator=(const Exception &) ;
 
         const char *what() const;
     private:

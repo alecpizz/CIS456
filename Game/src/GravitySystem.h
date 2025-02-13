@@ -16,7 +16,7 @@ public:
             }
             auto rb = component_manager.get_component<RigidBody2DComponent>(*e);
             auto grav = component_manager.get_component<GravityComponent>(*e);
-            rb.velocity += grav->force * delta_time;
+            rb->velocity += grav->force * delta_time;
         }
     }
 };

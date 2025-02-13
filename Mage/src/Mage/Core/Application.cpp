@@ -34,6 +34,7 @@ namespace Mage
         std::unique_ptr<TextRenderer> text_renderer;
         std::unique_ptr<SpriteRenderer> sprite_renderer;
         std::unique_ptr<ShapeRenderer> shape_renderer;
+        std::unique_ptr<Camera> camera;
         bool closing = false;
 
         void construct(const char *title, bool full_screen = true,
@@ -50,11 +51,16 @@ namespace Mage
             system_manager = std::unique_ptr<SystemManager>(new SystemManager());
             component_manager = std::unique_ptr<ComponentManager>(new ComponentManager());
             //TODO: initialize event manager, text renderer, sprite renderer, shape renderer
-
+            camera = std::unique_ptr<Camera>(new Camera());
+            shape_renderer = std::unique_ptr<ShapeRenderer>(new ShapeRenderer(*camera));
             component_manager->set_system_manager(*system_manager);
             entity_manager->set_system_manager(*system_manager);
             system_manager->set_component_manager(*component_manager);
             entity_manager->set_component_manager(*component_manager);
+            camera->left = 0.0f;
+            camera->right = static_cast<float>(window->get_width());
+            camera->top = static_cast<float>(window->get_height());
+            camera->bottom = 0.0f;
         }
     };
 
@@ -133,14 +139,18 @@ namespace Mage
         while (!_impl->closing)
         {
             _impl->entity_manager->update();
-            // poll events
-            // clear window
 
+            SDL_Event event;
+            while(SDL_PollEvent(&event))
+            {
+
+            }
+            _impl->window->clear_window();
             for(auto s : _impl->system_manager->get_all_systems())
             {
                 s->update(*_impl->component_manager, et.elapsed);
             }
-            // present the window
+            _impl->window->present();
             et.update();
         }
     }

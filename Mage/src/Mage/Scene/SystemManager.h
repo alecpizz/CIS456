@@ -42,8 +42,8 @@ namespace Mage
 
             //how the fuck
             //TODO: uncomment this when done with component manager
-//            (void) std::initializer_list<int>{
-//                    (add_system_component(system_id, get_component_manager().get_component_id<Ts>()), 0)...};
+            (void) std::initializer_list<int>{
+                    (add_system_component(system_id, get_component_manager().get_component_id<Ts>()), 0)...};
         }
 
     private:
