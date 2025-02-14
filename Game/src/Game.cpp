@@ -12,8 +12,10 @@ Game::Game() : Application("Game", 1024, 768, 0)
 
     _gravity_system = std::make_unique<GravitySystem>();
     _shape_rendering_system = std::make_unique<ShapeRenderingSystem>(*get_shape_renderer());
+    _movement_system = std::make_unique<MovementSystem>(static_cast<float>(get_window()->get_height()));
     get_system_manager()->register_system<RigidBody2DComponent, GravityComponent>(*_gravity_system);
     get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
+    get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
 
     _rands.add_uniform_real_distribution("rotation", -90.0f, 90.0f);
     _rands.add_uniform_real_distribution("scale_x", 10.0f, 50.0f);
@@ -48,4 +50,6 @@ void Game::add_random_shape()
                         _rands.get_uniform_real("color"),
                         _rands.get_uniform_real("color"))
     });
+
+    get_component_manager()->add_component<RigidBody2DComponent>(*e, {.velocity = glm::vec2(0.0f, 0.0f), .angular_velocity = glm::vec2(0.0f, 0.0f)});
 }

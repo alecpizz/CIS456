@@ -22,6 +22,7 @@ public:
 private:
     std::unique_ptr<GravitySystem> _gravity_system = nullptr;
     std::unique_ptr<ShapeRenderingSystem> _shape_rendering_system = nullptr;
+    std::unique_ptr<MovementSystem> _movement_system = nullptr;
     RandomWrapper _rands;
     void add_random_shape();
 };
