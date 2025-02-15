@@ -12,6 +12,11 @@ struct GravityComponent
     glm::vec2 force = glm::vec2(0.0f, 0.0f);
 };
 
+struct TorqueComponent
+{
+    float torque = 0.0f;
+};
+
 struct Transform2DComponent
 {
     glm::vec2 translation = glm::vec2(0.0f, 0.0f);
@@ -23,5 +28,5 @@ struct Transform2DComponent
 struct RigidBody2DComponent
 {
     glm::vec2 velocity = glm::vec2(0.0f, 0.0f);
-    glm::vec2 angular_velocity = glm::vec2(0.0f, 0.0f);
+    float angular_velocity = 0.0f;
 };

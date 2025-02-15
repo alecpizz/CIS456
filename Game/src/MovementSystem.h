@@ -23,6 +23,7 @@ public:
             auto rb = component_manager.get_component<RigidBody2DComponent>(*e);
             auto t = component_manager.get_component<Transform2DComponent>(*e);
             t->translation += rb->velocity;
+            t->rotation += rb->angular_velocity;
             if(t->translation.y < 0.0f)
             {
                 t->translation.y = _yMax;
