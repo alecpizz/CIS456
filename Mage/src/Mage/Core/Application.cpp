@@ -143,7 +143,10 @@ namespace Mage
             SDL_Event event;
             while(SDL_PollEvent(&event))
             {
-
+                if(event.type == SDL_QUIT)
+                {
+                    _impl->closing = true;
+                }
             }
             _impl->window->clear_window();
             for(auto s : _impl->system_manager->get_all_systems())
