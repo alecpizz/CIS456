@@ -5,13 +5,7 @@
 
 class MovementSystem final : public Mage::System
 {
-private:
-    float _yMax;
 public:
-    explicit MovementSystem(float yVal) :_yMax(yVal)
-    {
-
-    }
     void update(Mage::ComponentManager &component_manager, float delta_time) override
     {
         for (auto e: get_entities())
@@ -22,13 +16,9 @@ public:
             }
             auto rb = component_manager.get_component<RigidBody2DComponent>(*e);
             auto t = component_manager.get_component<Transform2DComponent>(*e);
-            t->translation += rb->velocity;
-            t->rotation += rb->angular_velocity;
-            if(t->translation.y < 0.0f)
-            {
-                t->translation.y = _yMax;
-                rb->velocity.y = 0.0f;
-            }
+            t->prev_translation = t->translation;
+            t->translation += rb->velocity * delta_time;
+            t->rotation += rb->angular_velocity * delta_time;
         }
     }
 };

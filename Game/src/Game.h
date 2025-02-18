@@ -16,7 +16,9 @@
 #include "SpriteRenderingSystem.h"
 #include "RandomWrapper.h"
 
-class Game : public Mage::Application
+class Game :
+        public Mage::Application,
+        public Mage::OnAppClosingEventListener
 {
 public:
     Game();
@@ -26,5 +28,6 @@ private:
     std::unique_ptr<MovementSystem> _movement_system = nullptr;
     std::unique_ptr<TorqueSystem> _torque_system = nullptr;
     RandomWrapper _rands;
+    void on_app_closing() override;
     void add_random_shape();
 };

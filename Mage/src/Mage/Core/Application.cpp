@@ -140,14 +140,7 @@ namespace Mage
         {
             _impl->entity_manager->update();
 
-            SDL_Event event;
-            while(SDL_PollEvent(&event))
-            {
-                if(event.type == SDL_QUIT)
-                {
-                    _impl->closing = true;
-                }
-            }
+            _impl->event_manager->poll_events();
             _impl->window->clear_window();
             for(auto s : _impl->system_manager->get_all_systems())
             {
