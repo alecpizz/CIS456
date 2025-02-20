@@ -14,41 +14,42 @@ namespace Mage
 
     class MAGE_API OnWindowMinimizedEventListener : public EventListenerBase
     {
-
+        //TODO: implement on_window_minimized()
     };
 
     class MAGE_API OnWindowMaximizedEventListener : public EventListenerBase
     {
-
+        //TODO: implement on_window_maximized()
     };
 
     class MAGE_API OnWindowRestoredEventListener : public EventListenerBase
     {
-
+        //TODO: etc...
     };
 
     class MAGE_API OnWindowMouseEnteredEventListener : public EventListenerBase
-    {
-
+    {//TODO: etc...
     };
 
     class MAGE_API OnWindowMouseLeftEventListener : public EventListenerBase
-    {
-
+    {//TODO: etc...
     };
 
     class MAGE_API OnWindowFocusGainedEventListener : public EventListenerBase
     {
-
+        //TODO: etc...
     };
 
     class MAGE_API OnWindowFocusLostEventListener : public EventListenerBase
     {
+        //TODO: etc...
 
     };
 
     class MAGE_API OnWindowResizedEventListener : public EventListenerBase
     {
+    public:
+        virtual void on_window_resized(uint32_t width, uint32_t height) = 0;
 
     };
 
@@ -60,57 +61,73 @@ namespace Mage
 
     class MAGE_API OnKeyUpEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_key_up(Key key, uint16_t key_modifiers) = 0;
     };
 
     class MAGE_API OnMouseMotionEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_mouse_motion(float x, float y, float x_delta, float y_delta, uint32_t button_states) = 0;
     };
 
     class MAGE_API OnMouseButtonDownEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_mouse_button_down(MouseButton button, float x, float y, uint8_t click_count) = 0;
     };
 
     class MAGE_API OnMouseButtonUpEventListener : public EventListenerBase
     {
-
+        //TODO: follow the mouse button down pattern
     };
 
     class MAGE_API OnMouseWheelEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_mouse_wheel(float x, float y, float mouse_x, float mouse_y, bool direction_flipped) = 0;
     };
 
     class MAGE_API OnControllerAxisMotionEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value);
     };
 
     class MAGE_API OnControllerButtonDownEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_controller_button_down(uint32_t controller_id, uint8_t button_id) = 0;
     };
 
     class MAGE_API OnControllerButtonUpEventListener : public EventListenerBase
     {
-
+        //TODO: follow the controller button down pattern
     };
 
     class MAGE_API OnControllerTouchpadDownEventListener : public EventListenerBase
     {
+    public:
+        virtual void on_controller_touchpad_down(uint32_t controller_id, int32_t touchpad_id,
+            int32_t finger_id, float x, float y, float pressure) = 0;
+    };
 
+    class MAGE_API OnControllerTouchpadUpEventListener : public EventListenerBase
+    {
+    public:
+        //TODO: follow the controller touchpad down pattern
     };
 
     class MAGE_API OnControllerTouchpadMotionEventListener : public EventListenerBase
     {
-
+        //TODO: follow the controller touchpad down pattern
     };
 
     class MAGE_API OnControllerSensorUpdateEventListener : public EventListenerBase
     {
-
+    public:
+        virtual void on_controller_sensor_update(uint32_t controller_id, uint32_t sensor_id, float sensor_value_x,
+            float sensor_value_y, float sensor_value_z, uint64_t timestamp) = 0;
     };
 
     class MAGE_API EventManager
@@ -160,6 +177,7 @@ namespace Mage
         void add_on_controller_button_down_event_listener(OnControllerButtonDownEventListener* listener);
         void add_on_controller_button_up_event_listener(OnControllerButtonUpEventListener* listener);
         void add_on_controller_touchpad_down_event_listener(OnControllerTouchpadDownEventListener* listener);
+        void add_on_controller_touchpad_up_event_listener(OnControllerTouchpadUpEventListener* listener);
         void add_on_controller_touchpad_motion_event_listener(OnControllerTouchpadMotionEventListener* listener);
         void add_on_controller_sensor_update_event_listener(OnControllerSensorUpdateEventListener* listener);
 
