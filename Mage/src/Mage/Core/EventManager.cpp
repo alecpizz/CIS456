@@ -14,6 +14,7 @@ namespace Mage
         std::vector<OnAppClosingEventListener *> on_app_closing_event_listeners;
         std::vector<OnKeyDownEventListener *> on_key_down_event_listeners;
         std::vector<OnWindowMinimizedEventListener *> on_window_minimized_event_listeners;
+        std::vector<OnWindowMaximizedEventListener *> on_window_maximized_event_listeners;
         std::vector<OnWindowRestoredEventListener *> on_window_restored_event_listeners;
         std::vector<OnWindowMouseEnteredEventListener *> on_window_mouse_entered_event_listeners;
         std::vector<OnWindowMouseLeftEventListener *> on_window_mouse_left_event_listeners;
@@ -51,7 +52,7 @@ namespace Mage
         // one difference: no need to check for listeners not existing and warn
         // another difference: use LOG_E_DEBUG
         // See SDL_WindowEvent_Resized docs
-        void on_window_resized(const SDL_Event& event)
+        void on_window_resized(const SDL_Event &event)
         {
             uint32_t new_width = event.window.data1;
             uint32_t new_height = event.window.data2;
@@ -60,9 +61,95 @@ namespace Mage
             {
                 LOG_E_DEBUG("Window resized height %d; width %d;", new_height, new_width);
             }
-            for (auto p : on_window_resized_event_listeners)
+            for (auto p: on_window_resized_event_listeners)
             {
                 p->on_window_resized(new_width, new_height);
+            }
+        }
+
+        void on_window_minimized()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window minimized");
+            }
+            for (auto p: on_window_minimized_event_listeners)
+            {
+                p->on_window_minimized();
+            }
+        }
+
+        void on_window_maximized()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window maximized");
+            }
+            for (auto p: on_window_maximized_event_listeners)
+            {
+                p->on_window_maximized();
+            }
+        }
+
+        void on_window_restored()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window restored");
+            }
+            for (auto p: on_window_restored_event_listeners)
+            {
+                p->on_window_restored();
+            }
+        }
+
+        void on_window_mouse_entered()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window mouse entered");
+            }
+
+            for (auto p: on_window_mouse_entered_event_listeners)
+            {
+                p->on_window_mouse_entered();
+            }
+        }
+
+        void on_window_mouse_left()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window mouse left");
+            }
+            for (auto p: on_window_mouse_left_event_listeners)
+            {
+                p->on_window_mouse_left();
+            }
+        }
+
+        void on_window_focus_gained()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window focus gained");
+            }
+            for (auto p: on_window_focus_gained_event_listeners)
+            {
+                p->on_window_focus_gained();
+            }
+        }
+
+        void on_window_focus_lost()
+        {
+            if (window_event_logging)
+            {
+                LOG_E_DEBUG("Window focus lost");
+            }
+
+            for (auto p: on_window_focus_lost_event_listeners)
+            {
+                p->on_window_focus_lost();
             }
         }
 
@@ -81,6 +168,21 @@ namespace Mage
             }
         }
 
+        void on_key_up(const SDL_Event &event)
+        {
+            auto key = translate_key(event.key.keysym.scancode);
+            uint16_t modifiers = event.key.keysym.mod;
+            if (keyboard_event_logging)
+            {
+                LOG_E_DEBUG("Key up; key %d; modifiers %d", key, modifiers);
+            }
+
+            for (auto p: on_key_up_event_listeners)
+            {
+                p->on_key_up(key, modifiers);
+            }
+        }
+
         void on_mouse_motion(const SDL_Event &event)
         {
             uint32_t button_states = 0;
@@ -96,14 +198,191 @@ namespace Mage
             if (mouse_event_logging && motion_event_logging)
             {
                 LOG_E_DEBUG("Mouse motion: button states %d; x %f; y %f; dX %f; dY %f", button_states,
-                    mouse_x, mouse_y, mouse_x_delta, mouse_y_delta);
+                            mouse_x, mouse_y, mouse_x_delta, mouse_y_delta);
             }
-            for (auto p : on_mouse_motion_event_listeners)
+            for (auto p: on_mouse_motion_event_listeners)
             {
                 p->on_mouse_motion(translate_mouse_x(mouse_x), translate_mouse_y(mouse_y),
-                    mouse_x_delta, mouse_y_delta, button_states);
+                                   mouse_x_delta, mouse_y_delta, button_states);
             }
         }
+
+        void on_mouse_button_down(const SDL_Event &event)
+        {
+            MouseButton button = translate_mouse_button(event.button.button);
+            auto mouse_x = static_cast<float>(event.button.x);
+            auto mouse_y = static_cast<float>(event.button.y);
+            uint8_t click_count = event.button.clicks;
+            if (mouse_event_logging)
+            {
+                LOG_E_DEBUG("Mouse button down; button %d; clicks %d", button, click_count);
+            }
+            for (auto p: on_mouse_button_down_event_listeners)
+            {
+                p->on_mouse_button_down(button, click_count, mouse_x, mouse_y);
+            }
+        }
+
+        void on_mouse_button_up(const SDL_Event &event)
+        {
+            MouseButton button = translate_mouse_button(event.button.button);
+            auto mouse_x = static_cast<float>(event.button.x);
+            auto mouse_y = static_cast<float>(event.button.y);
+            uint8_t click_count = event.button.clicks;
+            if (mouse_event_logging)
+            {
+                LOG_E_DEBUG("Mouse button up; button %d; clicks %d", button, click_count);
+            }
+            for (auto p: on_mouse_button_up_event_listeners)
+            {
+                p->on_mouse_button_up(button, click_count, mouse_x, mouse_y);
+            }
+        }
+
+        void on_mouse_wheel(const SDL_Event &event)
+        {
+            auto x = static_cast<float>(event.wheel.x);
+            auto y = static_cast<float>(event.wheel.y);
+            auto mouse_x = static_cast<float>(event.wheel.mouseX);
+            auto mouse_y = static_cast<float>(event.wheel.mouseY);
+            bool direction_flipped = event.wheel.direction;
+            if (mouse_event_logging)
+            {
+                LOG_E_DEBUG("Mouse weheel event; x %d; y %d; mouse_x %d;"
+                            " mouse_y %d; direction flipped %b", x, y, mouse_x, mouse_y, direction_flipped);
+            }
+            for (auto p: on_mouse_wheel_event_listeners)
+            {
+                p->on_mouse_wheel(x, y, mouse_x, mouse_y, direction_flipped);
+            }
+        }
+
+        void on_controller_axis_motion(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.caxis.which;
+            uint8_t axis_id = event.caxis.axis;
+            float axis_value = static_cast<float>(event.caxis.value);
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Controller axis event; controller_id %d; axis_id %d; axis_value %f",
+                            controller_id, axis_id, axis_value);
+            }
+            for (auto p: on_controller_axis_motion_event_listeners)
+            {
+                p->on_controller_axis_motion(controller_id, axis_id, axis_value);
+            }
+        }
+
+        void on_controller_button_down(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.cbutton.which;
+            uint8_t button_id = event.cbutton.button;
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Controller button down; controller id %d; button_id %d", controller_id, button_id);
+            }
+            for (auto p: on_controller_button_down_event_listeners)
+            {
+                p->on_controller_button_down(controller_id, button_id);
+            }
+        }
+
+        void on_controller_button_up(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.cbutton.which;
+            uint8_t button_id = event.cbutton.button;
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Controller button up; controller id %d; button_id %d", controller_id, button_id);
+            }
+            for (auto p: on_controller_button_up_event_listeners)
+            {
+                p->on_controller_button_up(controller_id, button_id);
+            }
+        }
+
+        void on_controller_touchpad_down(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.ctouchpad.which;
+            int32_t touchpad_id = event.ctouchpad.touchpad;
+            int32_t finger_id = event.ctouchpad.finger;
+            float x = event.ctouchpad.x;
+            float y = event.ctouchpad.y;
+            float pressure = event.ctouchpad.pressure;;
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Touch pad down; controller id %d; touchpad id %d; "
+                            "finger id %d; x %f; y %f; pressure %f;", controller_id,
+                            touchpad_id, finger_id, x, y, pressure);
+            }
+            for (auto p: on_controller_touchpad_down_event_listeners)
+            {
+                p->on_controller_touchpad_down(controller_id, touchpad_id, finger_id, x, y, pressure);
+            }
+        }
+
+        void on_controller_touchpad_up(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.ctouchpad.which;
+            int32_t touchpad_id = event.ctouchpad.touchpad;
+            int32_t finger_id = event.ctouchpad.finger;
+            float x = event.ctouchpad.x;
+            float y = event.ctouchpad.y;
+            float pressure = event.ctouchpad.pressure;;
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Touch pad up; controller id %d; touchpad id %d; "
+                            "finger id %d; x %f; y %f; pressure %f;", controller_id,
+                            touchpad_id, finger_id, x, y, pressure);
+            }
+            for (auto p: on_controller_touchpad_up_event_listeners)
+            {
+                p->on_controller_touchpad_up(controller_id, touchpad_id, finger_id, x, y, pressure);
+            }
+        }
+
+        void on_controller_touchpad_motion(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.ctouchpad.which;
+            int32_t touchpad_id = event.ctouchpad.touchpad;
+            int32_t finger_id = event.ctouchpad.finger;
+            float x = event.ctouchpad.x;
+            float y = event.ctouchpad.y;
+            float pressure = event.ctouchpad.pressure;;
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Touch pad motion; controller id %d; touchpad id %d; "
+                            "finger id %d; x %f; y %f; pressure %f;", controller_id,
+                            touchpad_id, finger_id, x, y, pressure);
+            }
+            for (auto p: on_controller_touchpad_motion_event_listeners)
+            {
+                p->on_controller_touchpad_motion(controller_id, touchpad_id, finger_id, x, y, pressure);
+            }
+        }
+
+        void on_controller_sensor_update(const SDL_Event &event)
+        {
+            uint32_t controller_id = event.csensor.which;
+            uint32_t sensor_id = event.csensor.sensor;
+            float sensor_value_x = event.csensor.data[0];
+            float sensor_value_y = event.csensor.data[1];
+            float sensor_value_z = event.csensor.data[2];
+            uint64_t timestamp = event.csensor.timestamp;
+            if (controller_event_logging)
+            {
+                LOG_E_DEBUG("Controller sensor update; controller id %d; "
+                            "sensor_id %d; sensor x %f; sensor y %f; sensor z %f; "
+                            "timestamp %d", controller_id, sensor_id, sensor_value_x,
+                            sensor_value_y, sensor_value_z, timestamp);
+            }
+            for (auto p: on_controller_sensor_update_event_listeners)
+            {
+                p->on_controller_sensor_update(controller_id, sensor_id, sensor_value_x,
+                                               sensor_value_y, sensor_value_z, timestamp);
+            }
+        }
+
 
         static MouseButton translate_mouse_button(uint8_t button)
         {
@@ -160,7 +439,6 @@ namespace Mage
                 case SDL_SCANCODE_Z: return Key::Z;
                 case SDL_SCANCODE_SLASH: return Key::BackSlash;
                 case SDL_SCANCODE_NUMLOCKCLEAR: return Key::NumLock;
-                //NOTE: SDL_SCANCODE_KP_* -> Key::Keypad*
                 case SDL_SCANCODE_KP_DIVIDE: return Key::KeypadDivide;
                 case SDL_SCANCODE_KP_MULTIPLY: return Key::KeypadMultiply;
                 case SDL_SCANCODE_KP_MINUS: return Key::KeypadMinus;
@@ -208,8 +486,34 @@ namespace Mage
                 case SDL_SCANCODE_PAGEDOWN: return Key::PageDown;
                 case SDL_SCANCODE_END: return Key::End;
                 case SDL_SCANCODE_MODE: return Key::AltGr;
-                //NOTE: SDL_SCANCODE_[L|R] -> Key::[Left|Right]
-                //TODO: for all other members of Key,
+                case SDL_SCANCODE_0: return Key::Zero;
+                case SDL_SCANCODE_1: return Key::One;
+                case SDL_SCANCODE_2: return Key::Two;
+                case SDL_SCANCODE_3: return Key::Three;
+                case SDL_SCANCODE_4: return Key::Four;
+                case SDL_SCANCODE_5: return Key::Five;
+                case SDL_SCANCODE_6: return Key::Six;
+                case SDL_SCANCODE_7: return Key::Seven;
+                case SDL_SCANCODE_8: return Key::Eight;
+                case SDL_SCANCODE_9: return Key::Nine;
+                case SDL_SCANCODE_RETURN: return Key::Return;
+                case SDL_SCANCODE_ESCAPE: return Key::Escape;
+                case SDL_SCANCODE_BACKSPACE: return Key::Backspace;
+                case SDL_SCANCODE_TAB: return Key::Tab;
+                case SDL_SCANCODE_MINUS: return Key::Minus;
+                case SDL_SCANCODE_EQUALS: return Key::Equals;
+                case SDL_SCANCODE_LEFTBRACKET: return Key::LeftBracket;
+                case SDL_SCANCODE_RIGHTBRACKET: return Key::RightBracket;
+                case SDL_SCANCODE_SEMICOLON: return Key::Semicolon;
+                case SDL_SCANCODE_APOSTROPHE: return Key::Apostrophe;
+                case SDL_SCANCODE_COMMA: return Key::Comma;
+                case SDL_SCANCODE_PERIOD: return Key::Period;
+                case SDL_SCANCODE_RIGHT: return Key::Right;
+                case SDL_SCANCODE_LEFT: return Key::Left;
+                case SDL_SCANCODE_DOWN: return Key::Down;
+                case SDL_SCANCODE_UP: return Key::Up;
+                case SDL_SCANCODE_LGUI: return Key::LeftGui;
+                case SDL_SCANCODE_RGUI: return Key::RightGui;
                 default: return Key::UnknownKey;
             }
         }
@@ -237,17 +541,68 @@ namespace Mage
         {
             switch (event.type)
             {
-                //TODO: handle all SDL to Mage event transitions
-                // you can get the full list by making sure a method in the impl is called
-                // for every event listener in the impl.
-                // there will be an obvious SDL_* to be on the left side of each case
-                // for all events that have no parameters, the impl method will take no parameters.
-                // for all others, the impl method will take the SDL_Event event as it's only parameter.
-                case SDL_QUIT:
-                    _impl->on_app_closing();
+                case SDL_WINDOW_MINIMIZED:
+                    _impl->on_window_minimized();
+                    break;
+                case SDL_WINDOW_MAXIMIZED:
+                    _impl->on_window_maximized();
+                    break;
+                case SDL_WINDOWEVENT_RESTORED:
+                    _impl->on_window_restored();
+                    break;
+                case SDL_WINDOWEVENT_ENTER:
+                    _impl->on_window_mouse_entered();
+                    break;
+                case SDL_WINDOWEVENT_LEAVE:
+                    _impl->on_window_mouse_left();
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    _impl->on_window_focus_gained();
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                    _impl->on_window_focus_lost();
                     break;
                 case SDL_WINDOWEVENT_RESIZED:
                     _impl->on_window_resized(event);
+                    break;
+                case SDL_KEYUP:
+                    _impl->on_key_up(event);
+                    break;
+                case SDL_KEYDOWN:
+                    _impl->on_key_down(event);
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    _impl->on_mouse_button_down(event);
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    _impl->on_mouse_button_up(event);
+                    break;
+                case SDL_MOUSEWHEEL:
+                    _impl->on_mouse_wheel(event);
+                    break;
+                case SDL_CONTROLLERAXISMOTION:
+                    _impl->on_controller_axis_motion(event);
+                    break;
+                case SDL_CONTROLLERBUTTONDOWN:
+                    _impl->on_controller_button_down(event);
+                    break;
+                case SDL_CONTROLLERBUTTONUP:
+                    _impl->on_controller_button_up(event);
+                    break;
+                case SDL_CONTROLLERTOUCHPADDOWN:
+                    _impl->on_controller_touchpad_down(event);
+                    break;
+                case SDL_CONTROLLERTOUCHPADMOTION:
+                    _impl->on_controller_touchpad_motion(event);
+                    break;
+                case SDL_CONTROLLERTOUCHPADUP:
+                    _impl->on_controller_touchpad_up(event);
+                    break;
+                case SDL_CONTROLLERSENSORUPDATE:
+                    _impl->on_controller_sensor_update(event);
+                    break;
+                case SDL_QUIT:
+                    _impl->on_app_closing();
                     break;
                 case SDL_MOUSEMOTION:
                     _impl->on_mouse_motion(event);
@@ -297,6 +652,11 @@ namespace Mage
     {
         _impl->on_app_closing_event_listeners.push_back(listener);
         LOG_E_INFO("OnAppClosingEventListener added: %s", typeid(*listener).name());
+    }
+
+    void EventManager::add_on_window_maximized_event_listener(OnWindowMaximizedEventListener *listener)
+    {
+        _impl->on_window_maximized_event_listeners.push_back(listener);
     }
 
     void EventManager::add_on_window_minimized_event_listener(OnWindowMinimizedEventListener *listener)
