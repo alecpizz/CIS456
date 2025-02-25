@@ -54,7 +54,6 @@ namespace Mage
         SpriteRenderer *get_sprite_renderer() const;
 
         ShapeRenderer *get_shape_renderer() const;
-        //finish for ComponentManager, SystemManager, EventManager, TextRenderer, SpriteRenderer, ShapeRenderer
 
         void close();
 

@@ -49,8 +49,9 @@ namespace Mage
 
             entity_manager = std::unique_ptr<EntityManager>(new EntityManager());
             system_manager = std::unique_ptr<SystemManager>(new SystemManager());
+            event_manager = std::unique_ptr<EventManager>(new EventManager(*window));
             component_manager = std::unique_ptr<ComponentManager>(new ComponentManager());
-            //TODO: initialize event manager, text renderer, sprite renderer, shape renderer
+            //TODO: initialize text renderer, sprite renderer
             camera = std::unique_ptr<Camera>(new Camera());
             shape_renderer = std::unique_ptr<ShapeRenderer>(new ShapeRenderer(*camera));
             component_manager->set_system_manager(*system_manager);

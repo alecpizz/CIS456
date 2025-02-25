@@ -46,12 +46,6 @@ namespace Mage
                 p->on_app_closing();
             }
         }
-
-        //TODO: like on_app_closing: on_window_minimized, on_window_maximized, on_maximized, on_window_restored,
-        // on_window_mouse_enter, on_window_mouse_left, on_window_focus_gained, on_window_focus_lost,
-        // one difference: no need to check for listeners not existing and warn
-        // another difference: use LOG_E_DEBUG
-        // See SDL_WindowEvent_Resized docs
         void on_window_resized(const SDL_Event &event)
         {
             uint32_t new_width = event.window.data1;
@@ -191,8 +185,8 @@ namespace Mage
             button_states += (event.motion.state & SDL_BUTTON_MMASK) ? static_cast<uint32_t>(MouseButton::Middle) : 0;
             button_states += (event.motion.state & SDL_BUTTON_X1MASK) ? static_cast<uint32_t>(MouseButton::Extra1) : 0;
             button_states += (event.motion.state & SDL_BUTTON_X2MASK) ? static_cast<uint32_t>(MouseButton::Extra2) : 0;
-            auto mouse_x = static_cast<float>(event.motion.x);
-            auto mouse_y = static_cast<float>(event.motion.y);
+            auto mouse_x = translate_mouse_x(static_cast<float>(event.motion.x));
+            auto mouse_y = translate_mouse_y(static_cast<float>(event.motion.y));
             auto mouse_x_delta = static_cast<float>(event.motion.xrel);
             auto mouse_y_delta = static_cast<float>(event.motion.yrel);
             if (mouse_event_logging && motion_event_logging)
@@ -210,8 +204,8 @@ namespace Mage
         void on_mouse_button_down(const SDL_Event &event)
         {
             MouseButton button = translate_mouse_button(event.button.button);
-            auto mouse_x = static_cast<float>(event.button.x);
-            auto mouse_y = static_cast<float>(event.button.y);
+            auto mouse_x = translate_mouse_x(static_cast<float>(event.button.x));
+            auto mouse_y = translate_mouse_y(static_cast<float>(event.button.y));
             uint8_t click_count = event.button.clicks;
             if (mouse_event_logging)
             {
@@ -219,15 +213,15 @@ namespace Mage
             }
             for (auto p: on_mouse_button_down_event_listeners)
             {
-                p->on_mouse_button_down(button, click_count, mouse_x, mouse_y);
+                p->on_mouse_button_down(button,  mouse_x, mouse_y, click_count);
             }
         }
 
         void on_mouse_button_up(const SDL_Event &event)
         {
             MouseButton button = translate_mouse_button(event.button.button);
-            auto mouse_x = static_cast<float>(event.button.x);
-            auto mouse_y = static_cast<float>(event.button.y);
+            auto mouse_x = translate_mouse_x(static_cast<float>(event.button.x));
+            auto mouse_y = translate_mouse_y(static_cast<float>(event.button.y));
             uint8_t click_count = event.button.clicks;
             if (mouse_event_logging)
             {
@@ -235,7 +229,7 @@ namespace Mage
             }
             for (auto p: on_mouse_button_up_event_listeners)
             {
-                p->on_mouse_button_up(button, click_count, mouse_x, mouse_y);
+                p->on_mouse_button_up(button, mouse_x, mouse_y, click_count);
             }
         }
 
@@ -243,9 +237,9 @@ namespace Mage
         {
             auto x = static_cast<float>(event.wheel.x);
             auto y = static_cast<float>(event.wheel.y);
-            auto mouse_x = static_cast<float>(event.wheel.mouseX);
-            auto mouse_y = static_cast<float>(event.wheel.mouseY);
-            bool direction_flipped = event.wheel.direction;
+            auto mouse_x = translate_mouse_x(static_cast<float>(event.wheel.mouseX));
+            auto mouse_y = translate_mouse_y(static_cast<float>(event.wheel.mouseY));
+            bool direction_flipped = event.wheel.direction != SDL_MOUSEWHEEL_NORMAL;
             if (mouse_event_logging)
             {
                 LOG_E_DEBUG("Mouse weheel event; x %d; y %d; mouse_x %d;"
@@ -261,7 +255,7 @@ namespace Mage
         {
             uint32_t controller_id = event.caxis.which;
             uint8_t axis_id = event.caxis.axis;
-            float axis_value = static_cast<float>(event.caxis.value);
+            float axis_value = translate_controller_axis_value(event.caxis.value);
             if (controller_event_logging)
             {
                 LOG_E_DEBUG("Controller axis event; controller_id %d; axis_id %d; axis_value %f",
@@ -364,7 +358,7 @@ namespace Mage
         void on_controller_sensor_update(const SDL_Event &event)
         {
             uint32_t controller_id = event.csensor.which;
-            uint32_t sensor_id = event.csensor.sensor;
+            ControllerSensor sensor_id = translate_controller_sensor(event.csensor.sensor);
             float sensor_value_x = event.csensor.data[0];
             float sensor_value_y = event.csensor.data[1];
             float sensor_value_z = event.csensor.data[2];
@@ -397,9 +391,30 @@ namespace Mage
             }
         }
 
+        float translate_controller_axis_value(int16_t axis_value)
+        {
+            auto rectified = std::abs(axis_value) < SDL_JOYSTICK_AXIS_MAX / 5 ? 0 : axis_value;
+            return (static_cast<float>(rectified) /
+                static_cast<float>(SDL_JOYSTICK_AXIS_MAX - SDL_JOYSTICK_AXIS_MIN) * 2.0f) - 1.0f;
+        }
+
         static float translate_mouse_x(float mouse_x)
         {
             return mouse_x;
+        }
+
+        static ControllerSensor translate_controller_sensor(Sint32 sensor_id)
+        {
+            switch (sensor_id)
+            {
+                case SDL_SENSOR_GYRO: return ControllerSensor::Gyroscope;
+                case SDL_SENSOR_ACCEL: return ControllerSensor::Accelerometer;
+                case SDL_SENSOR_GYRO_L: return ControllerSensor::LeftGyroscope;
+                case SDL_SENSOR_ACCEL_L: return ControllerSensor::LeftAccelerometer;
+                case SDL_SENSOR_GYRO_R: return ControllerSensor::RightGyroscope;
+                case SDL_SENSOR_ACCEL_R: return ControllerSensor::RightAccelerometer;
+                default: return ControllerSensor::Unknown;
+            }
         }
 
         float translate_mouse_y(float mouse_y)
@@ -437,7 +452,8 @@ namespace Mage
                 case SDL_SCANCODE_X: return Key::X;
                 case SDL_SCANCODE_Y: return Key::Y;
                 case SDL_SCANCODE_Z: return Key::Z;
-                case SDL_SCANCODE_SLASH: return Key::BackSlash;
+                case SDL_SCANCODE_SLASH: return Key::ForwardSlash;
+                case SDL_SCANCODE_BACKSLASH: return Key::BackSlash;
                 case SDL_SCANCODE_NUMLOCKCLEAR: return Key::NumLock;
                 case SDL_SCANCODE_KP_DIVIDE: return Key::KeypadDivide;
                 case SDL_SCANCODE_KP_MULTIPLY: return Key::KeypadMultiply;
@@ -517,8 +533,6 @@ namespace Mage
                 default: return Key::UnknownKey;
             }
         }
-
-        //TODO: all of the other event dispatch methods
     };
 
     EventManager::EventManager(Window &window)
@@ -657,106 +671,130 @@ namespace Mage
     void EventManager::add_on_window_maximized_event_listener(OnWindowMaximizedEventListener *listener)
     {
         _impl->on_window_maximized_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowMaximizedEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_window_minimized_event_listener(OnWindowMinimizedEventListener *listener)
     {
         _impl->on_window_minimized_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowMinimizedEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_window_restored_event_listener(OnWindowRestoredEventListener *listener)
     {
         _impl->on_window_restored_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowRestoredEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_window_mouse_entered_event_listener(OnWindowMouseEnteredEventListener *listener)
     {
         _impl->on_window_mouse_entered_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowMouseEnteredEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_window_mouse_left_event_listener(OnWindowMouseLeftEventListener *listener)
     {
         _impl->on_window_mouse_left_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowMouseLeftEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_window_focus_gained_event_listener(OnWindowFocusGainedEventListener *listener)
     {
         _impl->on_window_focus_gained_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowFocusGainedEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_window_focus_lost_event_listener(OnWindowFocusLostEventListener *listener)
     {
         _impl->on_window_focus_lost_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowFocusGainedLostListener added: %s", typeid(*listener).name());
+
     }
 
     void EventManager::add_on_window_resized_event_listener(OnWindowResizedEventListener *listener)
     {
         _impl->on_window_resized_event_listeners.push_back(listener);
+        LOG_E_INFO("OnWindowResizedEventListener added: %s", typeid(*listener).name());
+
     }
 
     void EventManager::add_on_key_down_event_listener(OnKeyDownEventListener *listener)
     {
         _impl->on_key_down_event_listeners.push_back(listener);
+        LOG_E_INFO("OnKeyDownEventListener added: %s", typeid(*listener).name());
+
     }
 
     void EventManager::add_on_key_up_event_listener(OnKeyUpEventListener *listener)
     {
         _impl->on_key_up_event_listeners.push_back(listener);
+        LOG_E_INFO("OnKeyUpEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_mouse_motion_event_listener(OnMouseMotionEventListener *listener)
     {
         _impl->on_mouse_motion_event_listeners.push_back(listener);
+        LOG_E_INFO("OnMouseMotionEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_mouse_button_up_event_listener(OnMouseButtonUpEventListener *listener)
     {
         _impl->on_mouse_button_up_event_listeners.push_back(listener);
+        LOG_E_INFO("OnMouseButtonUpListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_mouse_button_down_event_listener(OnMouseButtonDownEventListener *listener)
     {
         _impl->on_mouse_button_down_event_listeners.push_back(listener);
+        LOG_E_INFO("OnMouseButtonDownListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_mouse_wheel_event_listener(OnMouseWheelEventListener *listener)
     {
         _impl->on_mouse_wheel_event_listeners.push_back(listener);
+        LOG_E_INFO("OnMouseButtonWheelListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_axis_motion_event_listener(OnControllerAxisMotionEventListener *listener)
     {
         _impl->on_controller_axis_motion_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerAxisMotionEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_button_down_event_listener(OnControllerButtonDownEventListener *listener)
     {
         _impl->on_controller_button_down_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerButtonDownEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_button_up_event_listener(OnControllerButtonUpEventListener *listener)
     {
         _impl->on_controller_button_up_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerButtonUpEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_touchpad_down_event_listener(OnControllerTouchpadDownEventListener *listener)
     {
         _impl->on_controller_touchpad_down_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerTouchpadDownEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_touchpad_up_event_listener(OnControllerTouchpadUpEventListener *listener)
     {
         _impl->on_controller_touchpad_up_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerTouchpadUpEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_touchpad_motion_event_listener(
         OnControllerTouchpadMotionEventListener *listener)
     {
         _impl->on_controller_touchpad_motion_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerTouchpadMotionEventListener added: %s", typeid(*listener).name());
     }
 
     void EventManager::add_on_controller_sensor_update_event_listener(OnControllerSensorUpdateEventListener *listener)
     {
         _impl->on_controller_sensor_update_event_listeners.push_back(listener);
+        LOG_E_INFO("OnControllerSensorEventListener added: %s", typeid(*listener).name());
     }
 }

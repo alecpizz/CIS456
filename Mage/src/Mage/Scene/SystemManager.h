@@ -28,7 +28,6 @@ namespace Mage
 
         SystemManager &operator=(const SystemManager &) = delete;
 
-        //TODO: void register_system(System& system)
         template<typename ...Ts>
         void register_system(System &system)
         {
@@ -41,7 +40,6 @@ namespace Mage
             auto system_id = get_system_id(std::type_index(typeid(system)).hash_code());
 
             //how the fuck
-            //TODO: uncomment this when done with component manager
             (void) std::initializer_list<int>{
                     (add_system_component(system_id, get_component_manager().get_component_id<Ts>()), 0)...};
         }

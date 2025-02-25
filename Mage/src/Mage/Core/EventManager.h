@@ -99,7 +99,7 @@ namespace Mage
     class MAGE_API OnControllerAxisMotionEventListener : public EventListenerBase
     {
     public:
-        virtual void on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value);
+        virtual void on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value) = 0;
     };
 
     class MAGE_API OnControllerButtonDownEventListener : public EventListenerBase
@@ -138,7 +138,7 @@ namespace Mage
     class MAGE_API OnControllerSensorUpdateEventListener : public EventListenerBase
     {
     public:
-        virtual void on_controller_sensor_update(uint32_t controller_id, uint32_t sensor_id, float sensor_value_x,
+        virtual void on_controller_sensor_update(uint32_t controller_id, ControllerSensor sensor, float sensor_value_x,
                                                  float sensor_value_y, float sensor_value_z, uint64_t timestamp) = 0;
     };
 
