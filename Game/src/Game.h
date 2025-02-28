@@ -27,6 +27,7 @@ private:
     std::unique_ptr<ShapeRenderingSystem> _shape_rendering_system = nullptr;
     std::unique_ptr<MovementSystem> _movement_system = nullptr;
     std::unique_ptr<TorqueSystem> _torque_system = nullptr;
+    std::unique_ptr<Mage::Controller> _controller = nullptr;
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();

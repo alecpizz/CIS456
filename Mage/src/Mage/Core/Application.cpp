@@ -44,7 +44,6 @@ namespace Mage
             {
                 throw Exception((std::string("Failed to initialize SDL: ") + SDL_GetError()).c_str());
             }
-
             window = std::unique_ptr<Window>(new Window(title, full_screen, w, h, swap_interval));
 
             entity_manager = std::unique_ptr<EntityManager>(new EntityManager());
