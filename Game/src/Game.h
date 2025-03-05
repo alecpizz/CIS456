@@ -28,6 +28,8 @@ private:
     std::unique_ptr<MovementSystem> _movement_system = nullptr;
     std::unique_ptr<TorqueSystem> _torque_system = nullptr;
     std::unique_ptr<Mage::Controller> _controller = nullptr;
+    std::unique_ptr<PlayerSystem> _player_system = nullptr;
+    std::unique_ptr<SpriteRenderingSystem> _sprite_rendering_system = nullptr;
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();

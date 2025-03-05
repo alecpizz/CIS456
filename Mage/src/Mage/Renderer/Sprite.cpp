@@ -52,7 +52,6 @@ namespace Mage
         auto first_pos_byte = reinterpret_cast<void*>(0);
         auto first_uv_byte = reinterpret_cast<void*>(sizeof(GLfloat) * 2);
 
-        //this is wasteful, we don't need a vao for every object
         glGenVertexArrays(1, &_impl->vao);
         glGenBuffers(1, &_impl->vbo);
         glBindVertexArray(_impl->vao);
