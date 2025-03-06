@@ -56,6 +56,7 @@ namespace Mage
         glGenBuffers(1, &_impl->vbo);
         glBindVertexArray(_impl->vao);
         glBindBuffer(GL_ARRAY_BUFFER, _impl->vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24, nullptr, GL_DYNAMIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
             4 * sizeof(GLfloat), first_pos_byte);
