@@ -56,12 +56,12 @@ namespace Mage
         glGenBuffers(1, &_impl->vbo);
         glBindVertexArray(_impl->vao);
         glBindBuffer(GL_ARRAY_BUFFER, _impl->vbo);
+        glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
             4 * sizeof(GLfloat), first_pos_byte);
-        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
             4 * sizeof(GLfloat), first_uv_byte);
-        glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -135,7 +135,17 @@ namespace Mage
         glBindBuffer(GL_ARRAY_BUFFER, _impl->vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // auto error = glGetError();
+        // if (error != GL_NO_ERROR)
+        // {
+        //     LOG_E_ERROR("OpenGL Error: %s", gluErrorString(error));
+        // }
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        // error = glGetError();
+        // if (error != GL_NO_ERROR)
+        // {
+            // LOG_E_ERROR("OpenGL Error: %s", gluErrorString(error));
+        // }
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }

@@ -18,6 +18,8 @@ public:
                 continue;
             }
             auto s = componentManager.get_component<SpriteComponent>(*e);
+            auto t = componentManager.get_component<Transform2DComponent>(*e);
+            _sprite_renderer->render_sprite(*s->sprite, t->translation, t->scale, t->rotation, deltaTime);
         }
     }
 private:

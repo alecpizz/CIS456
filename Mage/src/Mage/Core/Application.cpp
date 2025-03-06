@@ -53,6 +53,7 @@ namespace Mage
             //TODO: initialize text renderer, sprite renderer
             camera = std::unique_ptr<Camera>(new Camera());
             shape_renderer = std::unique_ptr<ShapeRenderer>(new ShapeRenderer(*camera));
+            sprite_renderer = std::unique_ptr<SpriteRenderer>(new SpriteRenderer(*camera));
             component_manager->set_system_manager(*system_manager);
             entity_manager->set_system_manager(*system_manager);
             system_manager->set_component_manager(*component_manager);

@@ -21,6 +21,7 @@ namespace Mage
         {
             LOG_E_INFO("Controller created with index %d.", controller_idx);
         }
+        SDL_GameControllerUpdate();
     }
 
     Controller::~Controller()
