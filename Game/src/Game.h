@@ -30,6 +30,7 @@ private:
     std::unique_ptr<Mage::Controller> _controller = nullptr;
     std::unique_ptr<PlayerSystem> _player_system = nullptr;
     std::unique_ptr<SpriteRenderingSystem> _sprite_rendering_system = nullptr;
+    std::unique_ptr<CollisionSystem> _collision_system = nullptr;
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();

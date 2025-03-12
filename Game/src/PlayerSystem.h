@@ -43,10 +43,13 @@ public:
 
     void on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count) override;
 
+    void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
+
 private:
     Game* _game;
     Mage::Entity* _player_entity;
     std::map<std::string, std::shared_ptr<Mage::Sprite>> _player_sprites;
+    uint8_t _wasd_states = 0;
     void create_player_entity();
     void reset_player_entity();
 };
