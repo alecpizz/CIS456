@@ -126,6 +126,11 @@ namespace Mage
         return _impl->shape_renderer.get();
     }
 
+    Camera * Application::get_camera() const
+    {
+        return _impl->camera.get();
+    }
+
     void Application::close()
     {
         LOG_E_INFO("Application::closed called");

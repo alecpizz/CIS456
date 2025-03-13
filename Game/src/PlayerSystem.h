@@ -50,6 +50,9 @@ private:
     Mage::Entity* _player_entity;
     std::map<std::string, std::shared_ptr<Mage::Sprite>> _player_sprites;
     uint8_t _wasd_states = 0;
+    bool _jumping = false;
+    float _last_jump = 0.0f;
+    void jump();
     void create_player_entity();
     void reset_player_entity();
 };

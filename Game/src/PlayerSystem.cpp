@@ -34,6 +34,12 @@ void PlayerSystem::initialize()
     reset_player_entity();
 }
 
+void PlayerSystem::jump()
+{
+    _jumping = true;
+    _last_jump = 0.0f;
+}
+
 void PlayerSystem::create_player_entity()
 {
     _player_entity = _game->get_entity_manager()->add_entity(0);
@@ -43,12 +49,13 @@ void PlayerSystem::create_player_entity()
     _game->get_component_manager()->add_component(*_player_entity, RigidBody2DComponent{});
     _game->get_component_manager()->add_component(*_player_entity, Transform2DComponent{});
     _game->get_component_manager()->add_component(*_player_entity, BoundingBoxComponent
-    {
-        .on_collided = [&](Mage::Entity* self, Mage::Entity* other, const glm::vec2& overlap)
-        {
-            collision_detected(other, overlap);
-        }
-    });
+                                                  {
+                                                      .on_collided = [&](
+                                                  Mage::Entity *self, Mage::Entity *other, const glm::vec2 &overlap)
+                                                      {
+                                                          collision_detected(other, overlap);
+                                                      }
+                                                  });
 }
 
 void PlayerSystem::reset_player_entity()
@@ -72,36 +79,26 @@ void PlayerSystem::reset_player_entity()
 
 void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
 {
-    switch (key)
+    if (repeat_count > 0) return;
+    LOG_INFO("Key down: %d", key);
+    _wasd_states |= (key == Mage::Key::W) ? 0x01 : 0;
+    _wasd_states |= (key == Mage::Key::A) ? 0x02 : 0;
+    _wasd_states |= (key == Mage::Key::S) ? 0x04 : 0;
+    _wasd_states |= (key == Mage::Key::D) ? 0x08 : 0;
+    LOG_INFO("%d", _wasd_states);
+    if (key == Mage::Key::Space)
     {
-        case Mage::Key::W:
-            break;
-        case Mage::Key::S:
-            break;
-        case Mage::Key::D:
-            break;
-        case Mage::Key::A:
-            break;
-        default:
-            break;
+        jump();
     }
 }
 
 void PlayerSystem::on_key_up(Mage::Key key, uint16_t key_modifiers)
 {
-    switch (key)
-    {
-        case Mage::Key::W:
-            break;
-        case Mage::Key::S:
-            break;
-        case Mage::Key::D:
-            break;
-        case Mage::Key::A:
-            break;
-        default:
-            break;
-    }
+    _wasd_states &= (key == Mage::Key::W) ? ~0x01 : 0xFF;
+    _wasd_states &= (key == Mage::Key::A) ? ~0x02 : 0xFF;
+    _wasd_states &= (key == Mage::Key::S) ? ~0x04 : 0xFF;
+    _wasd_states &= (key == Mage::Key::D) ? ~0x08 : 0xFF;
+    LOG_INFO("%d", _wasd_states);
 }
 
 void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value)
@@ -119,6 +116,41 @@ void PlayerSystem::on_controller_button_up(uint32_t controller_id, uint8_t butto
 void PlayerSystem::update(Mage::ComponentManager &componentManager, float deltaTime)
 {
     //TODO: change player velocity based on _wasd_states
+    auto r = GPEC(RigidBody2DComponent);
+    auto prior_vel = r->velocity.x;
+    r->velocity.x = 0.0f;
+    if (_wasd_states & 0x02)
+    {
+        r->velocity.x += -1.0f;
+    }
+    if (_wasd_states & 0x08)
+    {
+        r->velocity.x += 1.0f;
+    }
+
+    r->velocity.x *= 500.0f;
+
+
+    _last_jump += deltaTime;
+    LOG_INFO("%f", _last_jump);
+    if (_jumping && _last_jump > 0.15f)
+    {
+        _jumping = false;
+        r->velocity.y = 500.0f;
+    }
+
+    auto s = GPEC(SpriteComponent);
+    auto t = GPEC(Transform2DComponent);
+    auto window_pos_x = _game->get_camera()->right - t->translation.x;
+    auto window_width = static_cast<float>(_game->get_window()->get_width());
+    auto scaled_sprite_width = static_cast<float>(s->sprite->get_width()) * t->scale.x;
+    auto scrolling_margin = window_width * 0.33f;
+    if ((r->velocity.x > 0.0f && window_pos_x - scaled_sprite_width < scrolling_margin) || (
+            r->velocity.x < 0.0f && window_pos_x > window_width - scrolling_margin))
+    {
+        _game->get_camera()->left += r->velocity.x * deltaTime;
+        _game->get_camera()->right += r->velocity.x * deltaTime;
+    }
 }
 
 void PlayerSystem::on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count)
@@ -150,8 +182,7 @@ void PlayerSystem::collision_detected(Mage::Entity *other_entity, const glm::vec
     {
         //previous position was above or below
         push_x = false;
-    }
-    else if (prev_overlap.y < 0.0f)
+    } else if (prev_overlap.y < 0.0f)
     {
         // previous position didn't overlap in either x or y
         // so push in whichever direction has the greater current overlap
@@ -162,14 +193,13 @@ void PlayerSystem::collision_detected(Mage::Entity *other_entity, const glm::vec
     {
         t->translation.x = t->prev_translation.x;
         r->velocity.x = 0.0f;
-    }
-    else if (overlap.x > 0.1f)
+    } else if (overlap.x > 0.1f)
     {
         if (r->velocity.y <= 0.0f)
         {
             //TODO: update our state to falling
+            r->velocity.y = 0.0f;
         }
         t->translation.y = t->prev_translation.y;
-        r->velocity.y = 0.0f;
     }
 }

@@ -54,6 +54,7 @@ namespace Mage
         SpriteRenderer *get_sprite_renderer() const;
 
         ShapeRenderer *get_shape_renderer() const;
+        Camera *get_camera() const;
 
         void close();
 

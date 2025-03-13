@@ -12,8 +12,8 @@ glm::vec2 CollisionSystem::calculate_overlap(const glm::vec2 &translationA, cons
 {
     auto x1 = (boundingBoxA->center.x * scaleA.x) + translationA.x;
     auto x2 = (boundingBoxB->center.x * scaleB.x) + translationB.x;
-    auto y1 = (boundingBoxA->center.y * scaleA.x) + translationA.y;
-    auto y2 = (boundingBoxB->center.y * scaleB.x) + translationB.y;
+    auto y1 = (boundingBoxA->center.y * scaleA.y) + translationA.y;
+    auto y2 = (boundingBoxB->center.y * scaleB.y) + translationB.y;
 
     auto delta_x = std::abs(x1 - x2);
     auto delta_y = std::abs(y1 - y2);
