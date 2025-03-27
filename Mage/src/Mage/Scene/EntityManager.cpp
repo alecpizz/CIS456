@@ -106,8 +106,8 @@ namespace Mage
         {
             if (e->is_destroyed())
             {
-                //TODO: tell system manager that entity was destroyed
-                //TODO: Tell component manager that entity was destroyed
+                _impl->component_manager->entity_destroyed(*e);
+                _impl->system_manager->entity_destroyed(*e);
             }
         }
 

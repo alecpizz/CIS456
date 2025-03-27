@@ -32,6 +32,8 @@ private:
     std::unique_ptr<SpriteRenderingSystem> _sprite_rendering_system = nullptr;
     std::unique_ptr<CollisionSystem> _collision_system = nullptr;
     std::unique_ptr<LifetimeSystem> _lifetime_system = nullptr;
+    std::unique_ptr<DeathByYSystem> _death_by_y_system = nullptr;
+    std::unique_ptr<DestructionNotificationSystem> _destruction_notification_system = nullptr;
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();

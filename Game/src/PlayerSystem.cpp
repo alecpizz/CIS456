@@ -2,7 +2,9 @@
 #include "Game.h"
 
 #define DURATION_JUMPING 0.15f
+#define DURATION_JUMPING_SMALL 0.15f
 #define VELOCITY_JUMP 500.0f
+#define VELOCITY_JUMP_SMALL 350.0f
 #define VELOCITY_PLAYER 500.0f
 #define SCALE_PLAYER 0.5f
 #define OFFSET_PLAYER_CENTER 24.0f
@@ -18,6 +20,7 @@
 #define VELOCITY_BULLET 1000.0f
 #define SCALE_BULLET 0.33f
 #define LIFETIME_BULLET 1.00f
+#define DURATION_SHOOTING 0.30f
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_player_entity)
 
@@ -47,9 +50,8 @@ void PlayerSystem::initialize()
     _player_sprites["hero_fall_shoot"] = std::make_shared<Mage::Sprite>("res/sprites/hero_fall_shoot.png", 6, 0.05f);
     _player_sprites["explosion"] = std::make_shared<Mage::Sprite>("res/sprites/explosion.png", 17, 0.08f);
     _player_sprites["bullet"] = std::make_shared<Mage::Sprite>("res/sprites/bullet.png", 7, 0.05f);
-    //create player entity
-    create_player_entity();
-    reset_player_entity();
+
+    spawn();
 }
 
 void PlayerSystem::shoot()
@@ -59,8 +61,16 @@ void PlayerSystem::shoot()
     add_bullet();
 }
 
+void PlayerSystem::spawn()
+{
+    create_player_entity();
+    reset_player_entity();
+
+}
+
 void PlayerSystem::jump()
 {
+    _jump_button_down_at = std::chrono::system_clock::now();
     _jumping = true;
     _last_jump = 0.0f;
     _player_sprites["hero_jump"]->start_over();
@@ -100,6 +110,14 @@ void PlayerSystem::create_player_entity()
                                                           collision_detected(other, overlap);
                                                       }
                                                   });
+
+    _game->get_component_manager()->add_component(*_player_entity, DestructionNotificationComponent
+    {
+        .on_destroyed = [&]()
+        {
+            spawn();
+        }
+    });
 }
 
 void PlayerSystem::reset_player_entity()
@@ -143,14 +161,22 @@ void PlayerSystem::update_player_velocity(RigidBody2DComponent *r, float dt)
     _last_jump += dt;
     if (_jumping && _last_jump > DURATION_JUMPING)
     {
+        _falling = true;
         _jumping = false;
+
         r->velocity.y = VELOCITY_JUMP;
+        auto jump_button_down_duration =
+            std::chrono::duration<float>(_jump_button_up_at - _jump_button_down_at).count();
+        if (jump_button_down_duration > 0.0f && jump_button_down_duration < DURATION_JUMPING_SMALL)
+        {
+            r->velocity.y = VELOCITY_JUMP_SMALL;
+        }
     }
 
-    if (r->velocity.y < 0.0f)
-    {
-        _falling = true;
-    }
+    // if (r->velocity.y < 0.0f)
+    // {
+    //     _falling = true;
+    // }
 }
 
 
@@ -167,7 +193,7 @@ void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t re
     if (key == Mage::Key::Return && !_jumping)
     {
         shoot();
-    } else if (key == Mage::Key::Space && (!_jumping || _falling))
+    } else if (key == Mage::Key::Space && !(_jumping || _falling))
     {
         jump();
     }
@@ -179,7 +205,11 @@ void PlayerSystem::on_key_up(Mage::Key key, uint16_t key_modifiers)
     _wasd_states &= (key == Mage::Key::A) ? ~0x02 : 0xFF;
     _wasd_states &= (key == Mage::Key::S) ? ~0x04 : 0xFF;
     _wasd_states &= (key == Mage::Key::D) ? ~0x08 : 0xFF;
-    LOG_INFO("%d", _wasd_states);
+
+    if (key == Mage::Key::Space)
+    {
+        _jump_button_up_at = std::chrono::system_clock::now();
+    }
 }
 
 void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value)
@@ -201,12 +231,19 @@ void PlayerSystem::update(Mage::ComponentManager &componentManager, float deltaT
     auto s = GPEC(SpriteComponent);
     auto t = GPEC(Transform2DComponent);
     auto b = GPEC(BoundingBoxComponent);
+
+    _last_shot += deltaTime;
+    if (_last_shot > DURATION_SHOOTING)
+    {
+        _shooting = false;
+    }
+
     update_player_velocity(r, deltaTime);
     update_player_sprite(r, s, t, b);
     update_camera(r, s, t, deltaTime);
 
-    auto bullets = _game->get_entity_manager()->get_all_entities_by_type(1).size();
-    LOG_INFO("Living bullets %d", bullets);
+    // auto bullets = _game->get_entity_manager()->get_all_entities_by_type(1).size();
+    // LOG_INFO("Living bullets %d", bullets);
 }
 
 void PlayerSystem::update_player_sprite(const RigidBody2DComponent *r, SpriteComponent *sprite, Transform2DComponent *t,

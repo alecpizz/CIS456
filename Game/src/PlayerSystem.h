@@ -50,14 +50,19 @@ private:
     Mage::Entity *_player_entity;
     std::map<std::string, std::shared_ptr<Mage::Sprite> > _player_sprites;
     uint8_t _wasd_states = 0;
+    float _controller_player_movement_x_axis = 0.0f;
     bool _jumping = false;
     bool _falling = false;
     bool _left_facing = false;
     bool _shooting = false;
     float _last_jump = 0.0f;
     float _last_shot = 0.0f;
+    std::chrono::time_point<std::chrono::system_clock> _jump_button_down_at;
+    std::chrono::time_point<std::chrono::system_clock> _jump_button_up_at;
 
     void shoot();
+
+    void spawn();
 
     void jump();
 
