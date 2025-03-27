@@ -47,3 +47,14 @@ struct BoundingBoxComponent
     glm::vec2 half_size = glm::vec2(0.5f, 0.5f);
     std::function<void(Mage::Entity*, Mage::Entity*, const glm::vec2&)> on_collided = nullptr;
 };
+
+struct LifetimeComponent
+{
+    float remaining = 0.0f;
+    std::function<void()> on_destroyed = nullptr;
+};
+
+struct DestructionNotificationComponent
+{
+    std::function<void()> on_destroyed = nullptr;
+};

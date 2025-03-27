@@ -21,6 +21,8 @@ Game::Game() : Application("Game", 1024, 768, 0)
     get_component_manager()->register_component<SpriteComponent>();
     get_component_manager()->register_component<PlayerComponent>();
     get_component_manager()->register_component<BoundingBoxComponent>();
+    get_component_manager()->register_component<LifetimeComponent>();
+    get_component_manager()->register_component<DestructionNotificationComponent>();
 
     _gravity_system = std::make_unique<GravitySystem>();
     _torque_system = std::make_unique<TorqueSystem>();
@@ -30,6 +32,7 @@ Game::Game() : Application("Game", 1024, 768, 0)
     _player_system = std::make_unique<PlayerSystem>(this);
     _controller = std::make_unique<Mage::Controller>(0);
     _collision_system = std::make_unique<CollisionSystem>(*this);
+    _lifetime_system = std::make_unique<LifetimeSystem>();
     LOG_INFO("Controller created for controller index 0; result: ", _controller.get());
     LOG_INFO("Controller has rumble: %d", _controller->has_rumble());
 
@@ -41,6 +44,7 @@ Game::Game() : Application("Game", 1024, 768, 0)
     get_system_manager()->register_system<PlayerComponent,
         SpriteComponent, GravityComponent, Transform2DComponent, RigidBody2DComponent>(*_player_system);
     get_system_manager()->register_system<BoundingBoxComponent, Transform2DComponent>(*_collision_system);
+    get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
 
     _player_system->initialize();
 

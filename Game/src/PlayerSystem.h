@@ -43,16 +43,34 @@ public:
 
     void on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count) override;
 
-    void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
+    void collision_detected(Mage::Entity *other_entity, const glm::vec2 &overlap);
 
 private:
-    Game* _game;
-    Mage::Entity* _player_entity;
-    std::map<std::string, std::shared_ptr<Mage::Sprite>> _player_sprites;
+    Game *_game;
+    Mage::Entity *_player_entity;
+    std::map<std::string, std::shared_ptr<Mage::Sprite> > _player_sprites;
     uint8_t _wasd_states = 0;
     bool _jumping = false;
+    bool _falling = false;
+    bool _left_facing = false;
+    bool _shooting = false;
     float _last_jump = 0.0f;
+    float _last_shot = 0.0f;
+
+    void shoot();
+
     void jump();
+
+    void add_bullet();
+
     void create_player_entity();
+
     void reset_player_entity();
+
+    void update_player_velocity(RigidBody2DComponent* r, float dt);
+
+    void update_camera(const RigidBody2DComponent* r, const SpriteComponent* s, const Transform2DComponent* t, float dt);
+
+    void update_player_sprite(const RigidBody2DComponent *r, SpriteComponent *sprite, Transform2DComponent *t,
+                              BoundingBoxComponent *b);
 };
