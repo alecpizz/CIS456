@@ -6,7 +6,7 @@
 
 namespace Galaga
 {
-    Galaga::Galaga() : Application("Galaga", 1024, 768, 0)
+    Galaga::Galaga() : Application("Galaga", 800, 600, 0)
     {
         Mage::Log::get().set_engine_log_level(Mage::Log::Level::Info);
         get_event_manager()->controller_event_logging(true);
@@ -16,6 +16,8 @@ namespace Galaga
         get_event_manager()->mouse_event_logging(true);
         get_event_manager()->window_event_logging(true);
         get_event_manager()->add_on_app_closing_event_listener(this);
+
+        LOG_INFO("HELLO");
     }
 
     void Galaga::on_app_closing()
