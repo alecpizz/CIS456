@@ -1,6 +1,6 @@
 #pragma once
 #include <Mage/Mage.h>
-
+#include "StarfighterSystem.h"
 
 namespace Galaga
 {
@@ -10,7 +10,10 @@ namespace Galaga
     {
     public:
         Galaga();
+
     private:
+        std::unique_ptr<StarfighterSystem> _starfighter_system = nullptr;
+
         void on_app_closing() override;
     };
 }
