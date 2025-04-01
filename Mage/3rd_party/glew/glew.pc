@@ -1,6 +1,6 @@
-prefix=C:/Program Files (x86)/Mage
+prefix=C:/Users/c2mit/OneDrive/Documents/GitHub/CIS456/out/install/MSVC-Debug
 exec_prefix=${prefix}
-libdir=C:/Program Files (x86)/Mage/lib
+libdir=C:/Users/c2mit/OneDrive/Documents/GitHub/CIS456/out/install/MSVC-Debug/lib
 includedir=${prefix}/include
 
 Name: glew

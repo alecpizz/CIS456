@@ -17,7 +17,6 @@ namespace Galaga
         get_event_manager()->window_event_logging(true);
         get_event_manager()->add_on_app_closing_event_listener(this);
 
-        LOG_INFO("HELLO");
     }
 
     void Galaga::on_app_closing()
