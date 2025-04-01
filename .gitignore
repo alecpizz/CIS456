@@ -366,3 +366,4 @@ cmake-build-debug-visual-studio
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+Mage/3rd_party/glew/glew.pc
