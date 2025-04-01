@@ -7,7 +7,7 @@ endif()
 add_executable(
  "Game" ${EXECUTABLE_TYPE_WIN32}
  "src/main.cpp"
- "src/Game.cpp"
+ "src/Game.cpp" "src/Galaga/Galaga.cpp"
  "src/PlayerSystem.cpp"
  "src/DeathByYSystem.cpp"
  "src/CollisionSystem.cpp" "src/DestructionNotificationSystem.h" "src/EnemySpawningSystem.h" "src/EnemySpawningSystem.cpp" "src/SpriteRenderingSystem.h" )

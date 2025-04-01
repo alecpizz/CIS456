@@ -1,10 +1,11 @@
 #include "Game.h"
+#include "Galaga/Galaga.h"
 
 int go()
 {
     LOG_INFO("Game started");
-    Game game;
-    game.run();
+    Galaga::Galaga gal;
+    gal.run();
     LOG_INFO("Game ended");
     return 0;
 }
