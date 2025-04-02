@@ -10,7 +10,8 @@ add_executable(
  "src/Game.cpp" "src/Galaga/Galaga.cpp"
  "src/PlayerSystem.cpp"
  "src/DeathByYSystem.cpp"
- "src/CollisionSystem.cpp" "src/DestructionNotificationSystem.h" "src/EnemySpawningSystem.h" "src/EnemySpawningSystem.cpp" "src/SpriteRenderingSystem.h" )
+ "src/CollisionSystem.cpp" "src/DestructionNotificationSystem.h" "src/EnemySpawningSystem.h" "src/EnemySpawningSystem.cpp" "src/SpriteRenderingSystem.h"
+        src/Galaga/EnemySpawner.cpp)
 
 set_property( TARGET "Game" PROPERTY LINKER_LANGUAGE CXX )
 set_property( TARGET "Game" PROPERTY CXX_STANDARD 20)

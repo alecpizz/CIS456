@@ -1,6 +1,6 @@
 #pragma once
 #include <Mage/Mage.h>
-
+#include "EnemySpawner.h"
 
 namespace Galaga
 {
