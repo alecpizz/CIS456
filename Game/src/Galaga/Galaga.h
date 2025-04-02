@@ -12,5 +12,6 @@ namespace Galaga
         Galaga();
     private:
         void on_app_closing() override;
+        std::unique_ptr<EnemySpawner> _enemy_spawner;
     };
 }
