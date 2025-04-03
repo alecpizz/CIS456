@@ -50,15 +50,13 @@ namespace Galaga
 
         void spawn();
 
-        //void shoot();
-
-        //void add_bullet();
+        void shoot();
 
         void create_player_entity();
 
         void reset_player_entity();
 
-        //void update_player_velocity(RigidBody2DComponent* r, float dt);
+        void update_player_velocity(RigidBody2DComponent* r, float dt);
 
         //void update_camera(const RigidBody2DComponent* r, const SpriteComponent* s, const Transform2DComponent* t, float dt);
 
