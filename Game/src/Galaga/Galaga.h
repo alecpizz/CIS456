@@ -1,6 +1,7 @@
 #pragma once
 #include <Mage/Mage.h>
 #include "EnemySpawner.h"
+#include "../ShapeRenderingSystem.h"
 
 namespace Galaga
 {
@@ -13,5 +14,6 @@ namespace Galaga
     private:
         void on_app_closing() override;
         std::unique_ptr<EnemySpawner> _enemy_spawner;
+        std::unique_ptr<ShapeRenderingSystem> _shape_renderer;
     };
 }

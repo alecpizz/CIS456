@@ -20,10 +20,13 @@ namespace Galaga
         get_event_manager()->add_on_app_closing_event_listener(this);
 
         _enemy_spawner = std::make_unique<EnemySpawner>(this, 8, 8);
+        _shape_renderer = std::make_unique<ShapeRenderingSystem>(*get_shape_renderer());
         get_component_manager()->register_component<Transform2DComponent>();
+        get_component_manager()->register_component<ColorComponent>();
 
-
+        get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_renderer);
         get_system_manager()->register_system<Transform2DComponent>(*_enemy_spawner);
+        _enemy_spawner->spawn();
     }
 
     void Galaga::on_app_closing()
