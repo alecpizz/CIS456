@@ -28,12 +28,12 @@ namespace Galaga
         get_component_manager()->register_component<LifetimeComponent>();
         get_component_manager()->register_component<DestructionNotificationComponent>();
 
-        //_starfighter_system = std::make_unique<StarfighterSystem>(this);
+        _starfighter_system = std::make_unique<StarfighterSystem>(this);
 
-        //get_system_manager()->register_system<PlayerComponent,
-        //    SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_starfighter_system);
+        get_system_manager()->register_system<PlayerComponent,
+            SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_starfighter_system);
 
-        //_starfighter_system->initialize();
+        _starfighter_system->initialize();
     }
 
     void Galaga::on_app_closing()
