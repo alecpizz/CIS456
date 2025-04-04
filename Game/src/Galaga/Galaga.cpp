@@ -24,6 +24,7 @@ namespace Galaga
         get_component_manager()->register_component<TorqueComponent>();
         get_component_manager()->register_component<SpriteComponent>();
         get_component_manager()->register_component<PlayerComponent>();
+        get_component_manager()->register_component<EnemyComponent>();
         get_component_manager()->register_component<BoundingBoxComponent>();
         get_component_manager()->register_component<LifetimeComponent>();
         get_component_manager()->register_component<DestructionNotificationComponent>();
@@ -31,15 +32,22 @@ namespace Galaga
         _shape_rendering_system = std::make_unique<ShapeRenderingSystem>(*get_shape_renderer());
         _movement_system = std::make_unique<MovementSystem>();
         _starfighter_system = std::make_unique<StarfighterSystem>(this);
+        _enemy_controller_system = std::make_unique<EnemyControllerSystem>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
 
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
         get_system_manager()->register_system<PlayerComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_starfighter_system);
+        get_system_manager()->register_system<EnemyComponent,
+            SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_controller_system);
+
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
 
         _starfighter_system->initialize();
+
+
+
     }
 
     void Galaga::on_app_closing()
