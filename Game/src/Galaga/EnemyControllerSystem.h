@@ -5,13 +5,13 @@
 
 namespace Galaga
 {
-    class Game;
+    class Galaga;
 
     class EnemyControllerSystem final :
         public Mage::System
     {
     public:
-        explicit EnemyControllerSystem(Game* game);
+        explicit EnemyControllerSystem(Galaga* game);
 
         ~EnemyControllerSystem() override = default;
 
@@ -23,9 +23,14 @@ namespace Galaga
         void update(Mage::ComponentManager& componentManager, float deltaTime) override;
 
     private:
-        Game* _game;
+        Galaga* _game;
         Mage::Entity* _enemy_entity;
         std::map<std::string, std::shared_ptr<Mage::Sprite> > _enemy_sprites;
+
+        bool _shooting = false;
+        float _last_shot = 0.0f;
+
+        void shoot();
 
         void update_enemy_velocity(RigidBody2DComponent* r, float dt);
 

@@ -26,10 +26,6 @@ namespace Galaga
     {
     }
 
-    void EnemyControllerSystem::initialize()
-    {
-    }
-
     void EnemyControllerSystem::shoot()
     {
         _shooting = true;
