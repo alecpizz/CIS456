@@ -24,6 +24,8 @@ namespace Galaga
 {
     EnemyControllerSystem::EnemyControllerSystem(Galaga* game) : _game(game)
     {
+        auto window_height = _game->get_window()->get_height();
+        auto window_width = _game->get_window()->get_width();
     }
 
     void EnemyControllerSystem::shoot()
@@ -57,7 +59,7 @@ namespace Galaga
         auto prior_vel = r->velocity.x;
         r->velocity.x = 0.0f;
         //update r-velocity.x to 1.0f or -1.0f to change the direction
-
+        
 
         r->velocity.x *= VELOCITY_ENEMY;
     }
