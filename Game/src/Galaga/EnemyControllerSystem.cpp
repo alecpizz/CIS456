@@ -66,5 +66,12 @@ namespace Galaga
 
     void EnemyControllerSystem::update(Mage::ComponentManager& component_manager, float delta_time)
     {
+        auto enemy_list = _game->get_entity_manager()->get_all_entities_by_type(69);
+
+        for (auto e : enemy_list)
+        {
+            auto er = GPEC(RigidBody2DComponent);
+            update_enemy_velocity(er, delta_time);
+        }
     }
 }
