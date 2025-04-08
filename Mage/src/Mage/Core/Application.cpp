@@ -50,10 +50,10 @@ namespace Mage
             system_manager = std::unique_ptr<SystemManager>(new SystemManager());
             event_manager = std::unique_ptr<EventManager>(new EventManager(*window));
             component_manager = std::unique_ptr<ComponentManager>(new ComponentManager());
-            //TODO: initialize text renderer, sprite renderer
             camera = std::unique_ptr<Camera>(new Camera());
             shape_renderer = std::unique_ptr<ShapeRenderer>(new ShapeRenderer(*camera));
             sprite_renderer = std::unique_ptr<SpriteRenderer>(new SpriteRenderer(*camera));
+            text_renderer = std::unique_ptr<TextRenderer>(new TextRenderer(*window));
             component_manager->set_system_manager(*system_manager);
             entity_manager->set_system_manager(*system_manager);
             system_manager->set_component_manager(*component_manager);
@@ -126,7 +126,7 @@ namespace Mage
         return _impl->shape_renderer.get();
     }
 
-    Camera * Application::get_camera() const
+    Camera *Application::get_camera() const
     {
         return _impl->camera.get();
     }
@@ -148,7 +148,7 @@ namespace Mage
 
             _impl->event_manager->poll_events();
             _impl->window->clear_window();
-            for(auto s : _impl->system_manager->get_all_systems())
+            for (auto s: _impl->system_manager->get_all_systems())
             {
                 s->update(*_impl->component_manager, et.elapsed);
             }
@@ -156,7 +156,4 @@ namespace Mage
             et.update();
         }
     }
-
-
-
 }

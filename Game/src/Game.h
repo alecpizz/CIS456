@@ -34,6 +34,7 @@ private:
     std::unique_ptr<LifetimeSystem> _lifetime_system = nullptr;
     std::unique_ptr<DeathByYSystem> _death_by_y_system = nullptr;
     std::unique_ptr<DestructionNotificationSystem> _destruction_notification_system = nullptr;
+    std::map<std::string, std::shared_ptr<Mage::Sprite> > _game_sprites;
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();

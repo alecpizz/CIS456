@@ -62,20 +62,53 @@ Game::Game() : Application("Game", 1024, 768, 0)
     _rands.add_uniform_real_distribution("pos_y", static_cast<float>(get_window()->get_height()),
                                          static_cast<float>(get_window()->get_height()) * 2.0f);
     _rands.add_uniform_real_distribution("torque", -45.0, 45.0f);
+    _rands.add_uniform_real_distribution("platform_size", 1.0f, 6.0f);
+    _rands.add_uniform_real_distribution("platform_gap", 50.0f, 450.0f);
 
-    auto e = get_entity_manager()->add_entity(1);
-    get_component_manager()->add_component<BoundingBoxComponent>(*e, {
-                                                                     .center = glm::vec2(0.5f, 0.5f),
-                                                                     .half_size = glm::vec2(0.5f, 0.5f)
-                                                                 });
-    get_component_manager()->add_component<Transform2DComponent>(*e, {.scale = {2000.0f, 10.0f}});
-    get_component_manager()->add_component<ColorComponent>(*e, {
-                                                               .color =
-                                                               Mage::Color::custom(_rands.get_uniform_real("color"),
-                                                                   _rands.get_uniform_real("color"),
-                                                                   _rands.get_uniform_real("color"),
-                                                                   _rands.get_uniform_real("color"))
-                                                           });
+
+    _game_sprites["platform_single"] = std::make_shared<Mage::Sprite>("res/sprites/platform_single.png", 1, 0.0f);
+    _game_sprites["platform_left"] = std::make_shared<Mage::Sprite>("res/sprites/platform_left.png", 1, 0.0f);
+    _game_sprites["platform_right"] = std::make_shared<Mage::Sprite>("res/sprites/platform_right.png", 1, 0.0f);
+    _game_sprites["platform_middle"] = std::make_shared<Mage::Sprite>("res/sprites/platform_middle.png", 1, 0.0f);
+
+
+    for (size_t x = 0; x < 2000;)
+    {
+        auto ps = static_cast<size_t>(_rands.get_uniform_real("platform_size"));
+
+        for (auto i = 0; i < ps; i++)
+        {
+            auto sprite = _game_sprites["platform_single"].get();
+            if (i > 0 && ps > 1 && i < ps - 1)
+            {
+                sprite = _game_sprites["platform_middle"].get();
+            }
+            else if (i == 0 && ps > 1)
+            {
+                sprite = _game_sprites["platform_left"].get();
+            }
+            else if (ps > 1)
+            {
+                sprite = _game_sprites["platform_right"].get();
+            }
+
+
+            auto e = get_entity_manager()->add_entity(1);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(sprite->get_width() / 2.0f, sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(sprite->get_width() / 2.0f, sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+            {
+                .translation = glm::vec2(x, 0.0f),
+                .scale = {0.5f, 0.5f},
+            });
+            get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
+            x += sprite->get_width() * 0.5f;
+        }
+
+        x += static_cast<size_t>(_rands.get_uniform_real("platform_gap"));
+    }
     // for (auto i = 0; i < 5000; i++)
     // {
     //     add_random_shape();

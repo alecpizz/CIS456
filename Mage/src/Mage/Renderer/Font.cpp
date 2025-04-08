@@ -58,7 +58,7 @@ namespace Mage
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
             //GL_RED because its single channel
-            glTexImage2D(texture, 0, GL_RED, static_cast<GLsizei>(face->glyph->bitmap.width),
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, static_cast<GLsizei>(face->glyph->bitmap.width),
                          static_cast<GLsizei>(face->glyph->bitmap.rows), 0, GL_RED,
                          GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

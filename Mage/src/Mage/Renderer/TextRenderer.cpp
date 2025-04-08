@@ -4,8 +4,46 @@ namespace Mage
 {
     struct TextRenderer::Impl
     {
-        const char *vs = ""; //TODO
-        const char *fs = ""; //TODO
+        const char *vs =
+                R"(
+                #version 330 core
+
+                layout( location = 0 ) in vec2 pos ;
+                layout( location = 1 ) in vec2 uv ;
+
+                uniform vec2 window_size ;
+
+                out vec2 texture_coords ;
+
+                void main()
+                {
+                    mat4 ortho_projection = mat4( 1.0f ) ;
+                    ortho_projection[ 0 ][ 0 ] = 2.0f / window_size.x ;
+                    ortho_projection[ 1 ][ 1 ] = 2.0f / window_size.y ;
+                    ortho_projection[ 2 ][ 2 ] = -1.0f ;
+                    ortho_projection[ 3 ][ 0 ] = -1.0f ;
+                    ortho_projection[ 3 ][ 1 ] = -1.0f ;
+
+                    gl_Position = ortho_projection * vec4( pos, 0.0, 1.0 ) ;
+
+                    texture_coords = uv ;
+                } )";
+
+        const char *fs =
+                R"(
+                #version 330 core
+                in vec2 texture_coords ;
+                out vec4 color ;
+
+                uniform sampler2D text ;
+                uniform vec4 text_color ;
+
+                void main()
+                {
+                    vec4 sampled = vec4( 1.0, 1.0, 1.0, texture( text, texture_coords ).r ) ;
+                    color = text_color * sampled ;
+                } )";
+
         Shader text_shader = Shader("TextShader", vs, fs);
         Window *window = nullptr;
         GLint window_size_uniform_loc = 0;
@@ -17,9 +55,9 @@ namespace Mage
         _impl = new Impl();
         _impl->window = &window;
         _impl->window_size_uniform_loc = glGetUniformLocation(_impl->text_shader.get_shader_id(),
-            "window_size");
+                                                              "window_size");
         _impl->text_color_uniform_loc = glGetUniformLocation(_impl->text_shader.get_shader_id(),
-            "text_color");
+                                                             "text_color");
     }
 
     TextRenderer::~TextRenderer()
