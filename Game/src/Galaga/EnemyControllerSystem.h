@@ -22,6 +22,8 @@ namespace Galaga
 
         void update(Mage::ComponentManager& componentManager, float deltaTime) override;
 
+        void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
+
     private:
         Galaga* _game;
         Mage::Entity* _enemy_entity;
@@ -34,6 +36,9 @@ namespace Galaga
 
         void update_enemy_velocity(RigidBody2DComponent* r, float dt);
 
+        void create_enemy_entity();
+        void place_enemy_entity();
+        void spawn();
         /*void update_enemy_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
             BoundingBoxComponent* b);*/
     };
