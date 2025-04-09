@@ -5,6 +5,8 @@
 #include "Galaga.h"
 #include "Components.h"
 
+#include "../Components.h"
+
 namespace Galaga
 {
     Galaga::Galaga() : Application("Galaga", 800, 600, 0)

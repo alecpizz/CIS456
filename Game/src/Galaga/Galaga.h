@@ -5,6 +5,7 @@
 #include "StarfighterSystem.h"
 #include "EnemyControllerSystem.h"
 #include "LifetimeSystem.h"
+#include "EnemySpawner.h"
 
 namespace Galaga
 {
@@ -23,5 +24,7 @@ namespace Galaga
         std::unique_ptr<LifetimeSystem> _lifetime_system = nullptr;
 
         void on_app_closing() override;
+        std::unique_ptr<EnemySpawner> _enemy_spawner;
+        std::unique_ptr<ShapeRenderingSystem> _shape_renderer;
     };
 }
