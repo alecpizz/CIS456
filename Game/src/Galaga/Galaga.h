@@ -22,9 +22,8 @@ namespace Galaga
         std::unique_ptr<StarfighterSystem> _starfighter_system = nullptr;
         std::unique_ptr<EnemyControllerSystem> _enemy_controller_system = nullptr;
         std::unique_ptr<LifetimeSystem> _lifetime_system = nullptr;
-
+        std::unique_ptr<EnemySpawner> _enemy_spawning_system = nullptr
+            ;
         void on_app_closing() override;
-        std::unique_ptr<EnemySpawner> _enemy_spawner;
-        std::unique_ptr<ShapeRenderingSystem> _shape_renderer;
     };
 }

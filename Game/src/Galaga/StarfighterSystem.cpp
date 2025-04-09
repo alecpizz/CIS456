@@ -93,7 +93,6 @@ namespace Galaga
         _game->get_component_manager()->add_component(*_player_entity, ColorComponent{
 	           .color = Mage::Color::custom(0.7f, 0.7f, 0.7f, 0.7f)
             });
-
         _game->get_component_manager()->add_component(*_player_entity, DestructionNotificationComponent
             {
                 .on_destroyed = [&]()

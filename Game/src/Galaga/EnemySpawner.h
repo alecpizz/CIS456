@@ -7,12 +7,26 @@ namespace Galaga
     class EnemySpawner final : public Mage::System
     {
     public:
-        EnemySpawner(Galaga* galaga, uint32_t rows, uint32_t cols);
+        explicit EnemySpawner(Galaga* galaga);
+
+        ~EnemySpawner() override = default;
+
+        EnemySpawner(EnemySpawner&&) = delete;
+        EnemySpawner(const EnemySpawner&) = delete;
+        EnemySpawner& operator=(EnemySpawner&&) = delete;
+        EnemySpawner& operator=(const EnemySpawner&) = delete;
+
+        void initialize();
         void update(Mage::ComponentManager &componentManager, float deltaTime) override;
-        void spawn();
+
     private:
         std::vector<Mage::Entity*> _enemies;
-        Galaga* _galaga;
-        uint32_t _rows, _cols;
+        Galaga* _game;
+        Mage::Entity* _enemy_entity;
+        std::map<std::string, std::shared_ptr<Mage::Sprite> > _enemy_sprites;
+
+        void create_enemy_entity();
+        void place_enemy_entity();
+        void spawn();
     };
 }

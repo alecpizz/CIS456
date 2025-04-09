@@ -35,10 +35,7 @@ namespace Galaga
         void shoot();
 
         void update_enemy_velocity(RigidBody2DComponent* r, float dt);
-
-        void create_enemy_entity();
-        void place_enemy_entity();
-        void spawn();
+        
         /*void update_enemy_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
             BoundingBoxComponent* b);*/
     };

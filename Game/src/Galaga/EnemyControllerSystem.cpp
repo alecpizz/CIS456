@@ -29,54 +29,6 @@ namespace Galaga
         auto window_width = _game->get_window()->get_width();
     }
 
-    void EnemyControllerSystem::create_enemy_entity()
-    {
-        _enemy_entity = _game->get_entity_manager()->add_entity(69);
-        _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
-            .on_collided = [&](Mage::Entity* hero, Mage::Entity* other, const glm::vec2 overlap)
-            {
-                collision_detected(other, overlap);
-            } });
-        _game->get_component_manager()->add_component(*_enemy_entity, DestructionNotificationComponent
-            {
-                .on_destroyed = [&]()
-                    {
-                        //TODO: Do Something? Or not
-                    }
-            });
-    }
-
-    void EnemyControllerSystem::place_enemy_entity()
-    {
-        auto s = GPEC(SpriteComponent);
-        auto t = GPEC(Transform2DComponent);
-        auto r = GPEC(RigidBody2DComponent);
-        auto b = GPEC(BoundingBoxComponent);
-
-        s->sprite = _enemy_sprites["#"].get();
-        r->velocity = { 0.0f, 0.0f };
-        t->scale = { SCALE_ENEMY, SCALE_ENEMY };
-        b->center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY };
-        b->half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY };
-        //Will need to change where the enemy spawns in by changing the translation 
-        t->prev_translation = t->translation = {
-            (static_cast<float>(_game->get_window()->get_width())
-                - static_cast<float>(s->sprite->get_width()) * 0.25f) / 2.0f,
-            (static_cast<float>(_game->get_window()->get_height())
-                - static_cast<float>(s->sprite->get_height()) * 0.5f) / 2.0f
-        };
-    }
-
-    void EnemyControllerSystem::spawn()
-    {
-        create_enemy_entity();
-        place_enemy_entity();
-    }
-
     void EnemyControllerSystem::shoot()
     {
         //Set up like the player shoot later
@@ -102,8 +54,8 @@ namespace Galaga
         for (auto e : enemy_list)
         {
             //This may not be needed, Enemy velocity may change based on collision
-            auto er = GPEC(RigidBody2DComponent);
-            update_enemy_velocity(er, delta_time);
+            //auto er = GPEC(RigidBody2DComponent);
+            //update_enemy_velocity(er, delta_time);
         }
     }
 

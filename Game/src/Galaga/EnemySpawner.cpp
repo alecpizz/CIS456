@@ -5,63 +5,79 @@
 
 #include "Galaga.h"
 
+#define SCALE_ENEMY 0.5f
+#define OFFSET_ENEMY_CENTER 24.0f
+#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 47.0f
+#define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
+#define BBOX_CENTER_Y_ENEMY 79.0f
+#define BBOX_HALF_WIDTH_ENEMY 37.0f
+#define BBOX_HALF_HEIGHT_ENEMY 79.0f
+
+#define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
+
 namespace Galaga
 {
-    EnemySpawner::EnemySpawner(Galaga *galaga, uint32_t rows, uint32_t cols) : _galaga(galaga), _rows(rows), _cols(cols)
+    EnemySpawner::EnemySpawner(Galaga *galaga) : _game(galaga)
     {
     }
 
-    void EnemySpawner::update(Mage::ComponentManager &componentManager, float deltaTime)
+    void EnemySpawner::initialize()
     {
+        spawn();
     }
 
     void EnemySpawner::spawn()
     {
-        uint32_t enemy_count = 30;
-        uint32_t width = 1;
-        uint32_t height = 1;
-        while (true)
-        {
-            if (width * height >= enemy_count)
+        create_enemy_entity();
+        place_enemy_entity();
+    }
+
+    void EnemySpawner::create_enemy_entity()
+    {
+        _enemy_entity = _game->get_entity_manager()->add_entity(69);
+        _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent{});
+        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{});
+        _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{});
+        _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{});
+        _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
+            .on_collided = [&](Mage::Entity* hero, Mage::Entity* other, const glm::vec2 overlap)
             {
-                break;
-            }
-            width++;
-            if (width * height >= enemy_count)
+                //collision_detected(other, overlap);
+            } });
+        _game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
+               .color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f)
+            });
+        _game->get_component_manager()->add_component(*_enemy_entity, DestructionNotificationComponent
             {
-                break;
-            }
-            height++;
-        }
-        float buffer_x = 1.5f;
-        float buffer_y = 1.5f;
-        float enemy_width = 60;
-        float enemy_height = 60;
-        glm::vec2 origin = glm::vec2(_galaga->get_window()->get_width() / 2, _galaga->get_window()->get_height() / 2);
-        float x_first = origin.x - (width * enemy_width / 2) - ((width - 1) * buffer_x / 2);
-        float y_first = origin.y - (height * enemy_height / 2) - ((height - 1) * buffer_y / 2);
+                .on_destroyed = [&]()
+                {
+                //TODO: Do Something? Or not
+                    
+                }
+            });
+    }
 
-        //assume all entites have been destroyed...?
-        _enemies.clear();
-        for (uint32_t i = 0; i < enemy_count; i++)
-        {
-            uint32_t x = i % width;
-            uint32_t y = i / width;
-            float xPos = x_first + (x * (enemy_width * buffer_x));
-            float yPos = y_first + (y * (enemy_height * buffer_y));
-            glm::vec2 pos = glm::vec2(xPos, yPos);
-            auto e = _galaga->get_entity_manager()->add_entity(69);
-            _galaga->get_component_manager()->add_component(*e, Transform2DComponent{
-                                                                .translation = pos,
-                                                                .scale = {enemy_width, enemy_height}
-                                                            });
-            _galaga->get_component_manager()->add_component(*e, ColorComponent{
-                                                                .color = Mage::Color::white
-                                                            });
-            //add enemy component here
+    void EnemySpawner::place_enemy_entity()
+    {
+        auto s = GPEC(SpriteComponent);
+        auto t = GPEC(Transform2DComponent);
+        auto r = GPEC(RigidBody2DComponent);
+        auto b = GPEC(BoundingBoxComponent);
 
+        //s->sprite = _enemy_sprites["#"].get();
+        r->velocity = { 0.0f, 0.0f };
+        t->scale = { SCALE_ENEMY, SCALE_ENEMY };
+        b->center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY };
+        b->half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY };
+        //Will need to change where the enemy spawns in by changing the translation 
+        t->scale = glm::vec2(20.0f, 20.0f);
+        t->prev_translation = t->translation = {
+            (_game->get_window()->get_width() - 20.0f * 0.25f) / 2.0f,
+            (_game->get_window()->get_height() - 40.0f * 0.25f) /2.0f
+        };
+    }
 
-            _enemies.push_back(e);
-        }
+    void EnemySpawner::update(Mage::ComponentManager& componentManager, float deltaTime)
+    {
     }
 }
