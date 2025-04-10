@@ -14,7 +14,7 @@
 #define BULLET_REL_2_PLAYER_X 36.0f
 #define BULLET_REL_2_PLAYER_Y 27.0f
 #define VELOCITY_BULLET 1000.0f
-#define SCALE_BULLET 0.33f
+#define SCALE_BULLET 5.0f
 #define LIFETIME_BULLET 3.0f
 #define DURATION_SHOOTING 0.3f
 
@@ -67,11 +67,21 @@ namespace Galaga
         _game->get_component_manager()->add_component<Transform2DComponent>(*e,
         {
         	.translation = {t->translation.x + 7.5f, t->translation.y + 20.0f},
-        	.scale = {5.0f, 5.0f}
+        	.scale = {SCALE_BULLET, SCALE_BULLET}
         });
         _game->get_component_manager()->add_component<LifetimeComponent>(*e,
         {
             .remaining = LIFETIME_BULLET
+        });
+        auto bullet_half_x = 0.5f * SCALE_BULLET;
+        auto bullet_half_y = 0.5f * SCALE_BULLET;
+        _game->get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+            .center = {bullet_half_x, bullet_half_y},
+            .half_size = {bullet_half_x, bullet_half_y},
+            .on_collided = [&](Mage::Entity* bullet, Mage::Entity* other, const glm::vec2& overlap)
+            {
+                //kill_enemy(bullet, other);
+            }
         });
     }
 

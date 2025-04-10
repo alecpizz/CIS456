@@ -21,7 +21,8 @@ namespace Galaga
             Player = 0,
             Bullet,
             Enemy,
-            Explosion
+            Explosion,
+            Wall
         };
 
         Galaga();
@@ -29,7 +30,6 @@ namespace Galaga
     private:
         std::unique_ptr<ShapeRenderingSystem> _shape_rendering_system = nullptr;
         std::unique_ptr<MovementSystem> _movement_system = nullptr;
-        std::unique_ptr<CollisionSystem> _collision_system = nullptr;
         std::unique_ptr<PlayerSystem> _player_system = nullptr;
         std::unique_ptr<EnemyControllerSystem> _enemy_controller_system = nullptr;
         std::unique_ptr<LifetimeSystem> _lifetime_system = nullptr;

@@ -86,6 +86,12 @@ namespace Galaga
 
     void EnemySpawner::collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap)
     {
+        if (other_entity->get_type() == Galaga::EntityType::Bullet)
+        {
+            LOG_INFO("Enemy hit!");
+            return;
+        }
+
         auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
         auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
 

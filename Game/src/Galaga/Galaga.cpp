@@ -38,11 +38,9 @@ namespace Galaga
         _enemy_controller_system = std::make_unique<EnemyControllerSystem>(this);
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
-        _collision_system = std::make_unique<CollisionSystem>(*this);
 
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
-        get_system_manager()->register_system<BoundingBoxComponent, Transform2DComponent>(*_collision_system);
         get_system_manager()->register_system<PlayerComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_player_system);
         get_system_manager()->register_system<EnemyComponent,
@@ -58,7 +56,7 @@ namespace Galaga
 
 
         // basic wall for testing
-        auto e = get_entity_manager()->add_entity(1);
+        auto e = get_entity_manager()->add_entity(EntityType::Wall);
         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
                                                                          .center = glm::vec2(0.5f, 0.5f),
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
