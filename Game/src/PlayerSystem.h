@@ -80,4 +80,6 @@ private:
 
     void update_player_sprite(const RigidBody2DComponent *r, SpriteComponent *sprite, Transform2DComponent *t,
                               BoundingBoxComponent *b);
+
+    void kill_enemy(Mage::Entity* bullet, Mage::Entity* other);
 };

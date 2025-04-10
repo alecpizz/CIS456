@@ -78,8 +78,9 @@ void PlayerSystem::add_bullet()
 {
     auto t = GPEC(Transform2DComponent);
     auto bullet_dir = _left_facing ? -1.0f : 1.0f;
-    auto e = _game->get_entity_manager()->add_entity(1);
-    _game->get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = _player_sprites["bullet"].get()});
+    auto e = _game->get_entity_manager()->add_entity(Game::EntityType::Bullet);
+    auto s = _player_sprites["bullet"].get();
+    _game->get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = s});
     _game->get_component_manager()->add_component<RigidBody2DComponent>(*e, {
                                                                             .velocity = {
                                                                                 bullet_dir * VELOCITY_BULLET, 0.0f
@@ -98,11 +99,23 @@ void PlayerSystem::add_bullet()
                                                                      {
                                                                          .remaining = LIFETIME_BULLET
                                                                      });
+    auto bullet_half_x = static_cast<float>(s->get_width()) * 0.5f * SCALE_BULLET;
+    auto bullet_half_y = static_cast<float>(s->get_height()) * 0.5f * SCALE_BULLET;
+    _game->get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                            .center = {bullet_half_x, bullet_half_y},
+                                                                            .half_size = {bullet_half_x, bullet_half_y},
+                                                                            .on_collided = [&](
+                                                                        Mage::Entity *bullet, Mage::Entity *other,
+                                                                        const glm::vec2 &overlap)
+                                                                            {
+                                                                                kill_enemy(bullet, other);
+                                                                            }
+                                                                        });
 }
 
 void PlayerSystem::create_player_entity()
 {
-    _player_entity = _game->get_entity_manager()->add_entity(0);
+    _player_entity = _game->get_entity_manager()->add_entity(Game::EntityType::Player);
     _game->get_component_manager()->add_component(*_player_entity, PlayerComponent{});
     _game->get_component_manager()->add_component(*_player_entity, GravityComponent{});
     _game->get_component_manager()->add_component(*_player_entity, SpriteComponent{});
@@ -141,7 +154,7 @@ void PlayerSystem::reset_player_entity()
     t->prev_translation = t->translation = {
                               (_game->get_camera()->left + 0.15 * _game->get_window()->get_width()),
                               (_game->get_camera()->top - static_cast<float>(s->sprite->get_height()) * SCALE_PLAYER
-                                  - static_cast<float>(_game->get_window()->get_height()) * 0.667f)
+                               - static_cast<float>(_game->get_window()->get_height()) * 0.667f)
                           };
     b->center = {BBOX_RIGHT_FACING_CENTER_X_PLAYER, BBOX_CENTER_Y_PLAYER};
     b->half_size = {BBOX_HALF_WIDTH_PLAYER, BBOX_HALF_HEIGHT_PLAYER};
@@ -308,6 +321,30 @@ void PlayerSystem::update_player_sprite(const RigidBody2DComponent *r, SpriteCom
     b->center.x = _left_facing ? BBOX_LEFT_FACING_CENTER_X_PLAYER : BBOX_RIGHT_FACING_CENTER_X_PLAYER;
 }
 
+void PlayerSystem::kill_enemy(Mage::Entity *bullet, Mage::Entity *other)
+{
+    if (other->get_type() != Game::EntityType::Enemy)
+    {
+        return;
+    }
+
+    bullet->destroy();
+    other->destroy();
+    //TODO: kill count
+    auto bt = _game->get_component_manager()->get_component<Transform2DComponent>(*bullet);
+    auto es = _player_sprites["explosion"].get();
+    auto e = _game->get_entity_manager()->add_entity(Game::EntityType::Explosion);
+    _game->get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = es});
+    _game->get_component_manager()->add_component<LifetimeComponent>(*e, {.remaining = 1.19f});
+    _game->get_component_manager()->add_component<Transform2DComponent>(*e, {
+                                                                            .translation = glm::vec2(
+                                                                                bt->translation.x - static_cast<float>(
+                                                                                    es->get_width()) / 2.0f,
+                                                                                bt->translation.y - static_cast<float>(
+                                                                                    es->get_height()) / 2.0f)
+                                                                        });
+}
+
 void PlayerSystem::on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count)
 {
     if (button == Mage::MouseButton::Left)
@@ -337,6 +374,17 @@ void PlayerSystem::update_camera(const RigidBody2DComponent *r, const SpriteComp
 
 void PlayerSystem::collision_detected(Mage::Entity *other_entity, const glm::vec2 &overlap)
 {
+    if (other_entity->get_type() == Game::EntityType::Enemy)
+    {
+        other_entity->destroy();
+        _player_entity->destroy();
+        return;
+    }
+
+    if (other_entity->get_type() == Game::EntityType::Bullet)
+    {
+        return;
+    }
     auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
     auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
 
