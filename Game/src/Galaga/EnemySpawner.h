@@ -1,5 +1,6 @@
 #pragma once
 #include <Mage/Mage.h>
+#include "RandomWrapper.h"
 
 namespace Galaga
 {
@@ -10,7 +11,7 @@ namespace Galaga
         explicit EnemySpawner(Galaga* galaga);
 
         ~EnemySpawner() override = default;
-
+        
         EnemySpawner(EnemySpawner&&) = delete;
         EnemySpawner(const EnemySpawner&) = delete;
         EnemySpawner& operator=(EnemySpawner&&) = delete;
@@ -18,12 +19,15 @@ namespace Galaga
 
         void initialize();
         void update(Mage::ComponentManager &componentManager, float deltaTime) override;
+        void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
 
     private:
         std::vector<Mage::Entity*> _enemies;
         Galaga* _game;
         Mage::Entity* _enemy_entity;
         std::map<std::string, std::shared_ptr<Mage::Sprite> > _enemy_sprites;
+
+        RandomWrapper _rands;
 
         void create_enemy_entity();
         void place_enemy_entity();

@@ -1,7 +1,7 @@
 #include "EnemyControllerSystem.h"
 #include "Galaga.h"
 
-#define VELOCITY_ENEMY 500.0f
+
 #define SCALE_ENEMY 0.5f
 #define OFFSET_ENEMY_CENTER 24.0f
 #define GRAVITY_ENEMY 1000.0f
@@ -36,15 +36,11 @@ namespace Galaga
 
     void EnemyControllerSystem::update_enemy_velocity(RigidBody2DComponent* r, float dt)
     {
-        auto prior_x_vel = r->velocity.x;
+        /*auto prior_x_vel = r->velocity.x;
         r->velocity.x = 0.0f;
         auto prior_y_vel = r->velocity.y;
-        r->velocity.y = 0.0f;
-        
-        //TODO: update r-velocity.x/y to 1.0f or -1.0f to change the direction
+        r->velocity.y = 0.0f;*/
 
-        r->velocity.x *= VELOCITY_ENEMY;
-        r->velocity.y *= VELOCITY_ENEMY;
     }
 
     void EnemyControllerSystem::update(Mage::ComponentManager& component_manager, float delta_time)
@@ -57,10 +53,5 @@ namespace Galaga
             //auto er = GPEC(RigidBody2DComponent);
             //update_enemy_velocity(er, delta_time);
         }
-    }
-
-    void EnemyControllerSystem::collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap)
-    {
-        //have any collision reverse the direction of travel, either velocity.x or velocity.y or both
     }
 }

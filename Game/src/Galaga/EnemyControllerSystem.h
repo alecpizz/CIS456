@@ -22,8 +22,6 @@ namespace Galaga
 
         void update(Mage::ComponentManager& componentManager, float deltaTime) override;
 
-        void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
-
     private:
         Galaga* _game;
         Mage::Entity* _enemy_entity;
