@@ -7,6 +7,7 @@ namespace Mage
     class MAGE_API Sprite
     {
     public:
+        explicit Sprite(const Sprite* sprite);
         Sprite(const char *sprite_image_file, uint32_t frames, float frame_time);
 
         Sprite(Sprite &&) = delete;
