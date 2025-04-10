@@ -5,7 +5,6 @@
 
 namespace Galaga
 {
-
     class Galaga;
 
     class CollisionSystem : public Mage::System

@@ -36,7 +36,7 @@ namespace Galaga
 
     void EnemySpawner::create_enemy_entity()
     {
-        _enemy_entity = _game->get_entity_manager()->add_entity(69);
+        _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent{});
         _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{});
         _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{});
@@ -86,6 +86,12 @@ namespace Galaga
 
     void EnemySpawner::collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap)
     {
+        if (other_entity->get_type() == Galaga::EntityType::Bullet)
+        {
+            LOG_INFO("Enemy hit!");
+            return;
+        }
+
         auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
         auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
 
