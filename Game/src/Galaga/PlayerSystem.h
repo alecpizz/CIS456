@@ -7,7 +7,7 @@ namespace Galaga
 {
     class Galaga;
 
-    class StarfighterSystem final :
+    class PlayerSystem final :
         public Mage::System,
         public Mage::OnKeyDownEventListener,
         public Mage::OnKeyUpEventListener,
@@ -17,16 +17,16 @@ namespace Galaga
         public Mage::OnMouseButtonDownEventListener
     {
     public:
-        explicit StarfighterSystem(Galaga* game);
+        explicit PlayerSystem(Galaga* game);
 
-        ~StarfighterSystem() override = default;
+        ~PlayerSystem() override = default;
 
         void initialize();
 
-        StarfighterSystem(StarfighterSystem&&) = delete;
-        StarfighterSystem(const StarfighterSystem&) = delete;
-        StarfighterSystem& operator=(StarfighterSystem&&) = delete;
-        StarfighterSystem& operator=(const StarfighterSystem&) = delete;
+        PlayerSystem(PlayerSystem&&) = delete;
+        PlayerSystem(const PlayerSystem&) = delete;
+        PlayerSystem& operator=(PlayerSystem&&) = delete;
+        PlayerSystem& operator=(const PlayerSystem&) = delete;
 
         void on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count) override;
         void on_key_up(Mage::Key key, uint16_t key_modifiers) override;
@@ -37,7 +37,7 @@ namespace Galaga
 
         void update(Mage::ComponentManager& component_manager, float delta_time) override;
 
-        //void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
+        void collision_detected(Mage::Entity* other_entity);
 
     private:
         Galaga* _game;
@@ -56,7 +56,7 @@ namespace Galaga
 
         void reset_player_entity();
 
-        void update_player_velocity(RigidBody2DComponent* r, float dt);
+        void update_player_velocity(RigidBody2DComponent* r, Transform2DComponent* t, float dt);
 
         //void update_camera(const RigidBody2DComponent* r, const SpriteComponent* s, const Transform2DComponent* t, float dt);
 

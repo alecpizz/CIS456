@@ -1,4 +1,4 @@
-#include "StarfighterSystem.h"
+#include "PlayerSystem.h"
 #include "Galaga.h"
 
 #define VELOCITY_PLAYER 500.0f
@@ -14,7 +14,7 @@
 #define BULLET_REL_2_PLAYER_X 36.0f
 #define BULLET_REL_2_PLAYER_Y 27.0f
 #define VELOCITY_BULLET 1000.0f
-#define SCALE_BULLET 0.33f
+#define SCALE_BULLET 5.0f
 #define LIFETIME_BULLET 3.0f
 #define DURATION_SHOOTING 0.3f
 
@@ -22,11 +22,11 @@
 
 namespace Galaga
 {
-    StarfighterSystem::StarfighterSystem(Galaga* game) : _game(game)
+    PlayerSystem::PlayerSystem(Galaga* game) : _game(game)
     {
     }
 
-    void StarfighterSystem::initialize()
+    void PlayerSystem::initialize()
     {
         //register event handlers
         _game->get_event_manager()->add_on_key_down_event_listener(this);
@@ -43,18 +43,18 @@ namespace Galaga
         spawn();
     }
 
-    void StarfighterSystem::spawn()
+    void PlayerSystem::spawn()
     {
         create_player_entity();
         reset_player_entity();
     }
 
-    void StarfighterSystem::shoot()
+    void PlayerSystem::shoot()
     {
         _shooting = true;
         _last_shot = 0.0f;
         auto t = GPEC(Transform2DComponent);
-        auto e = _game->get_entity_manager()->add_entity(1);
+        auto e = _game->get_entity_manager()->add_entity(Galaga::EntityType::Bullet);
         //_game->get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = _player_sprites["bullet"].get() });
         _game->get_component_manager()->add_component<ColorComponent>(*e,
         {
@@ -67,33 +67,41 @@ namespace Galaga
         _game->get_component_manager()->add_component<Transform2DComponent>(*e,
         {
         	.translation = {t->translation.x + 7.5f, t->translation.y + 20.0f},
-        	.scale = {5.0f, 5.0f}
+        	.scale = {SCALE_BULLET, SCALE_BULLET}
         });
         _game->get_component_manager()->add_component<LifetimeComponent>(*e,
         {
             .remaining = LIFETIME_BULLET
         });
+        auto bullet_half_x = 0.5f * SCALE_BULLET;
+        auto bullet_half_y = 0.5f * SCALE_BULLET;
+        _game->get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+            .center = {bullet_half_x, bullet_half_y},
+            .half_size = {bullet_half_x, bullet_half_y},
+            .on_collided = [&](Mage::Entity* bullet, Mage::Entity* other, const glm::vec2& overlap)
+            {
+                //kill_enemy(bullet, other);
+            }
+        });
     }
 
-    void StarfighterSystem::create_player_entity()
+    void PlayerSystem::create_player_entity()
     {
-        _player_entity = _game->get_entity_manager()->add_entity(0);
+        _player_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Player);
         _game->get_component_manager()->add_component(*_player_entity, PlayerComponent{});
         //_game->get_component_manager()->add_component(*_player_entity, SpriteComponent{});
         _game->get_component_manager()->add_component(*_player_entity, RigidBody2DComponent{});
         _game->get_component_manager()->add_component(*_player_entity, Transform2DComponent{});
-        /*_game->get_component_manager()->add_component(*_player_entity, BoundingBoxComponent
-            {
-                .on_collided = [&](
-            Mage::Entity* self, Mage::Entity* other, const glm::vec2& overlap)
-                {
-                    collision_detected(other, overlap);
-                }
-            });*/
+        _game->get_component_manager()->add_component(*_player_entity, BoundingBoxComponent
+	        {
+	            .on_collided = [&](Mage::Entity* self, Mage::Entity* other, const glm::vec2& overlap)
+	            {
+	                collision_detected(other);
+	            }
+	        });
         _game->get_component_manager()->add_component(*_player_entity, ColorComponent{
 	           .color = Mage::Color::custom(0.7f, 0.7f, 0.7f, 0.7f)
             });
-
         _game->get_component_manager()->add_component(*_player_entity, DestructionNotificationComponent
             {
                 .on_destroyed = [&]()
@@ -103,7 +111,7 @@ namespace Galaga
             });
     }
 
-    void StarfighterSystem::reset_player_entity()
+    void PlayerSystem::reset_player_entity()
     {
         //auto s = GPEC(SpriteComponent);
         auto t = GPEC(Transform2DComponent);
@@ -121,15 +129,14 @@ namespace Galaga
         r->velocity = glm::vec2(0.0f, 0.0f);
     }
 
-    void StarfighterSystem::update_player_velocity(RigidBody2DComponent* r, float delta_time)
+    void PlayerSystem::update_player_velocity(RigidBody2DComponent* r, Transform2DComponent* t, float delta_time)
     {
-        auto prior_vel = r->velocity.x;
         r->velocity.x = 0.0f;
-        if (_wasd_states & 0x02)
+        if (_wasd_states & 0x02 && t->translation.x > 0.0f)
         {
             r->velocity.x += -1.0f;
         }
-        if (_wasd_states & 0x08)
+        if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - 20.0f)
         {
             r->velocity.x += 1.0f;
         }
@@ -137,7 +144,7 @@ namespace Galaga
         r->velocity.x *= VELOCITY_PLAYER;
     }
 
-    void StarfighterSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
+    void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
     {
         if (repeat_count > 0) return;
         LOG_INFO("Key down: %d", key);
@@ -153,7 +160,7 @@ namespace Galaga
         }
     }
 
-    void StarfighterSystem::on_key_up(Mage::Key key, uint16_t key_modifiers)
+    void PlayerSystem::on_key_up(Mage::Key key, uint16_t key_modifiers)
     {
         _wasd_states &= (key == Mage::Key::W) ? ~0x01 : 0xFF;
         _wasd_states &= (key == Mage::Key::A) ? ~0x02 : 0xFF;
@@ -161,10 +168,10 @@ namespace Galaga
         _wasd_states &= (key == Mage::Key::D) ? ~0x08 : 0xFF;
     }
 
-    void StarfighterSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value) {}
-    void StarfighterSystem::on_controller_button_down(uint32_t controller_id, uint8_t button_id) {}
-    void StarfighterSystem::on_controller_button_up(uint32_t controller_id, uint8_t button_id) {}
-    void StarfighterSystem::on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count)
+    void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value) {}
+    void PlayerSystem::on_controller_button_down(uint32_t controller_id, uint8_t button_id) {}
+    void PlayerSystem::on_controller_button_up(uint32_t controller_id, uint8_t button_id) {}
+    void PlayerSystem::on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count)
     {
         /*if (button == Mage::MouseButton::Left)
         {
@@ -176,13 +183,29 @@ namespace Galaga
         }*/
     }
 
-    void StarfighterSystem::update(Mage::ComponentManager& component_manager, float delta_time)
+    void PlayerSystem::update(Mage::ComponentManager& component_manager, float delta_time)
     {
         auto r = GPEC(RigidBody2DComponent);
         //auto s = GPEC(SpriteComponent);
         auto t = GPEC(Transform2DComponent);
         auto b = GPEC(BoundingBoxComponent);
 
-        update_player_velocity(r, delta_time);
+        update_player_velocity(r, t, delta_time);
+    }
+
+    void PlayerSystem::collision_detected(Mage::Entity* other_entity)
+    {
+        if (other_entity->get_type() == Galaga::EntityType::Enemy)
+        {
+            //other_entity->destroy();
+            //_player_entity->destroy();
+            LOG_INFO("You hit an enemy!");
+            return;
+        }
+
+        if (other_entity->get_type() == Galaga::EntityType::Bullet)
+        {
+            return;
+        }
     }
 }
