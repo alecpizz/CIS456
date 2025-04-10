@@ -41,6 +41,11 @@ struct PlayerComponent
 
 };
 
+struct EnemyComponent
+{
+
+};
+
 struct BoundingBoxComponent
 {
     glm::vec2 center = glm::vec2(0.5f, 0.5f);

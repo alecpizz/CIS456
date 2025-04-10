@@ -21,7 +21,16 @@ class Game :
         public Mage::OnAppClosingEventListener
 {
 public:
+    enum EntityType : uint32_t
+    {
+        Player = 0,
+        Platform,
+        Bullet,
+        Enemy,
+        Explosion
+    };
     Game();
+    RandomWrapper* get_rands();
 private:
     std::unique_ptr<GravitySystem> _gravity_system = nullptr;
     std::unique_ptr<ShapeRenderingSystem> _shape_rendering_system = nullptr;
@@ -33,7 +42,9 @@ private:
     std::unique_ptr<CollisionSystem> _collision_system = nullptr;
     std::unique_ptr<LifetimeSystem> _lifetime_system = nullptr;
     std::unique_ptr<DeathByYSystem> _death_by_y_system = nullptr;
+    std::unique_ptr<EnemySpawningSystem> _enemy_spawning_system = nullptr;
     std::unique_ptr<DestructionNotificationSystem> _destruction_notification_system = nullptr;
+    std::map<std::string, std::shared_ptr<Mage::Sprite> > _game_sprites;
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();
