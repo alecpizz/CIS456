@@ -120,15 +120,14 @@ namespace Galaga
         r->velocity = glm::vec2(0.0f, 0.0f);
     }
 
-    void StarfighterSystem::update_player_velocity(RigidBody2DComponent* r, float delta_time)
+    void StarfighterSystem::update_player_velocity(RigidBody2DComponent* r, Transform2DComponent* t, float delta_time)
     {
-        auto prior_vel = r->velocity.x;
         r->velocity.x = 0.0f;
-        if (_wasd_states & 0x02)
+        if (_wasd_states & 0x02 && t->translation.x > 0.0f)
         {
             r->velocity.x += -1.0f;
         }
-        if (_wasd_states & 0x08)
+        if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - 20.0f)
         {
             r->velocity.x += 1.0f;
         }
@@ -182,6 +181,6 @@ namespace Galaga
         auto t = GPEC(Transform2DComponent);
         auto b = GPEC(BoundingBoxComponent);
 
-        update_player_velocity(r, delta_time);
+        update_player_velocity(r, t, delta_time);
     }
 }

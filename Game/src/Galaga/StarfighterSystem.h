@@ -56,7 +56,7 @@ namespace Galaga
 
         void reset_player_entity();
 
-        void update_player_velocity(RigidBody2DComponent* r, float dt);
+        void update_player_velocity(RigidBody2DComponent* r, Transform2DComponent* t, float dt);
 
         //void update_camera(const RigidBody2DComponent* r, const SpriteComponent* s, const Transform2DComponent* t, float dt);
 
