@@ -96,12 +96,12 @@ namespace Galaga
         auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
             oe_t->translation, oe_t->scale, bb, oe_bb);
 
-        if (prev_overlap.x > 0.0f)
+        if (prev_overlap.x = 0.0f)
         {
             t->translation.x = t->prev_translation.x;
             r->velocity.x *= -1.0f;
         }
-        else if (prev_overlap.y > 0.0f)
+        else if (prev_overlap.y = 0.0f)
         {
             t->translation.y = t->prev_translation.y;
             r->velocity.y *= -1.0f;
