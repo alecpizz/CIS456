@@ -33,22 +33,24 @@ namespace Galaga
 
         _shape_rendering_system = std::make_unique<ShapeRenderingSystem>(*get_shape_renderer());
         _movement_system = std::make_unique<MovementSystem>();
-        _starfighter_system = std::make_unique<StarfighterSystem>(this);
+        _collision_system = std::make_unique<CollisionSystem>(*this);
+        _player_system = std::make_unique<PlayerSystem>(this);
         _enemy_controller_system = std::make_unique<EnemyControllerSystem>(this);
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
 
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
+        get_system_manager()->register_system<BoundingBoxComponent, Transform2DComponent>(*_collision_system);
         get_system_manager()->register_system<PlayerComponent,
-            SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_starfighter_system);
+            SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_player_system);
         get_system_manager()->register_system<EnemyComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_controller_system);
         get_system_manager()->register_system<EnemyComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_spawning_system);
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
 
-        _starfighter_system->initialize();
+        _player_system->initialize();
         _enemy_spawning_system->initialize();
     }
 
