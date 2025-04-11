@@ -67,7 +67,7 @@ namespace Galaga
             glm::vec2 pos = glm::vec2(xPos, yPos);
 
             create_enemy_entity(pos);
-            //Go through place enemy entity and adjust the settings into create_enemy_entity gotten from spawn
+            
         }
     }
 
@@ -90,9 +90,9 @@ namespace Galaga
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
             .center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY },
             .half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY },
-            .on_collided = [&](Mage::Entity* player, Mage::Entity* other, const glm::vec2 overlap)
+            .on_collided = [&](Mage::Entity* enemy, Mage::Entity* other, const glm::vec2 overlap)
             {
-                collision_detected(other, overlap);
+                collision_detected(enemy, other, overlap);
             } });
         _game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
                .color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f)
@@ -112,7 +112,7 @@ namespace Galaga
     {
     }
 
-    void EnemySpawner::collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap)
+    void EnemySpawner::collision_detected(Mage::Entity* enemy, Mage::Entity* other_entity, const glm::vec2& overlap)
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
@@ -120,27 +120,56 @@ namespace Galaga
             return;
         }
 
-        auto r = GPEC(RigidBody2DComponent);
-        auto bb = GPEC(BoundingBoxComponent);
-        auto t = GPEC(Transform2DComponent);
-
-        auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
-        auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
-
-        if (other_entity->get_type() == Galaga::EntityType::Wall)
+        if (other_entity->get_type() == Galaga::EntityType::Wall || other_entity->get_type() == Galaga::EntityType::Enemy)
         {
-            r->velocity.x *= -1;
-            r->velocity.y *= -1;
-            return;
+            //LOG_INFO("Enemy Hit Wall.");
+            auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
+            auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
+            
+
+            //GPEC Cannot be used below otherwise collision will only apply to the last generated enemy
+            auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*enemy);
+            auto bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*enemy);
+            auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*enemy);
+            auto c = _game->get_component_manager()->get_component<ColorComponent>(*enemy);
+            
+            auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
+                oe_t->translation, oe_t->scale, bb, oe_bb);
+
+
+
+            //This doesnt Work Right
+            if (overlap.y > 0.1f)
+            {
+                c->color = Mage::Color::aquamarine;
+                t->translation.x = t->prev_translation.x;
+                r->velocity.x *= -1.0f ;
+            }
+            if (overlap.x > 0.1f)
+            {
+                c->color = Mage::Color::magenta;
+                t->translation.y = t->prev_translation.y;
+                r->velocity.y *= -1.0f;
+            }
+            //This also Doesnt Work Right
+            if (other_entity->get_type() == Galaga::EntityType::Enemy)
+            {
+                auto oe_r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*other_entity);
+                auto oe_c = _game->get_component_manager()->get_component<ColorComponent>(*other_entity);
+                if (overlap.y > 0.1f)
+                {
+                    oe_c->color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f);
+                    oe_t->translation.x = t->prev_translation.x;
+                    oe_r->velocity.x *= -1.0f;
+                }
+                if (overlap.x > 0.1f)
+                {
+                    oe_c->color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f);
+                    oe_t->translation.y = t->prev_translation.y;
+                    oe_r->velocity.y *= -1.0f;
+                }
+            }
         }
 
-        if (other_entity->get_type() == Galaga::EntityType::Enemy)
-        {
-            auto oe_r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*other_entity);
-
-
-            return;
-        }
-        
     }
 }

@@ -9,7 +9,7 @@
 
 namespace Galaga
 {
-    Galaga::Galaga() : Application("Galaga", 1000, 800, 0)
+    Galaga::Galaga() : Application("Galaga", 800, 600, 0)
     {
         Mage::Log::get().set_engine_log_level(Mage::Log::Level::Info);
         get_event_manager()->controller_event_logging(true);
