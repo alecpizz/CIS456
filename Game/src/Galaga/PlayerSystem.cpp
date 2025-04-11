@@ -6,11 +6,11 @@
 #define OFFSET_PLAYER_CENTER 24.0f
 #define GRAVITY_PLAYER 1000.0f
 #define SCROLL_MARGIN 0.33f
-#define BBOX_RIGHT_FACING_CENTER_X_PLAYER 47.0f
+#define BBOX_RIGHT_FACING_CENTER_X_PLAYER 0.5f
 #define BBOX_LEFT_FACING_CENTER_X_PLAYER 77.0f
-#define BBOX_CENTER_Y_PLAYER 79.0f
-#define BBOX_HALF_WIDTH_PLAYER 37.0f
-#define BBOX_HALF_HEIGHT_PLAYER 79.0f
+#define BBOX_CENTER_Y_PLAYER 0.5f
+#define BBOX_HALF_WIDTH_PLAYER 0.5f
+#define BBOX_HALF_HEIGHT_PLAYER 0.5f
 #define BULLET_REL_2_PLAYER_X 36.0f
 #define BULLET_REL_2_PLAYER_Y 27.0f
 #define VELOCITY_BULLET 1000.0f
@@ -73,8 +73,8 @@ namespace Galaga
         {
             .remaining = LIFETIME_BULLET
         });
-        auto bullet_half_x = 0.5f * SCALE_BULLET;
-        auto bullet_half_y = 0.5f * SCALE_BULLET;
+        auto bullet_half_x = 0.5f;
+        auto bullet_half_y = 0.5f;
         _game->get_component_manager()->add_component<BoundingBoxComponent>(*e, {
             .center = {bullet_half_x, bullet_half_y},
             .half_size = {bullet_half_x, bullet_half_y},
@@ -116,7 +116,7 @@ namespace Galaga
         //auto s = GPEC(SpriteComponent);
         auto t = GPEC(Transform2DComponent);
         auto r = GPEC(RigidBody2DComponent);
-        //auto b = GPEC(BoundingBoxComponent);
+        auto b = GPEC(BoundingBoxComponent);
 
         //s->sprite = _player_sprites["hero_idle"].get();
         t->scale = glm::vec2(20.0f, 20.0f);
@@ -124,8 +124,8 @@ namespace Galaga
         	(_game->get_window()->get_width() - 20.0f * 0.25f) / 2.0f,
         	20.0f
         };
-        //b->center = { BBOX_RIGHT_FACING_CENTER_X_PLAYER, BBOX_CENTER_Y_PLAYER };
-        //b->half_size = { BBOX_HALF_WIDTH_PLAYER, BBOX_HALF_HEIGHT_PLAYER };
+        b->center = { BBOX_RIGHT_FACING_CENTER_X_PLAYER, BBOX_CENTER_Y_PLAYER };
+        b->half_size = { BBOX_HALF_WIDTH_PLAYER, BBOX_HALF_HEIGHT_PLAYER };
         r->velocity = glm::vec2(0.0f, 0.0f);
     }
 

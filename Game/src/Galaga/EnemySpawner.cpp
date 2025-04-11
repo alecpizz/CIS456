@@ -8,11 +8,11 @@
 #define VELOCITY_ENEMY 50.0f
 #define SCALE_ENEMY 0.5f
 #define OFFSET_ENEMY_CENTER 24.0f
-#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 47.0f
+#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
 #define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
-#define BBOX_CENTER_Y_ENEMY 79.0f
-#define BBOX_HALF_WIDTH_ENEMY 37.0f
-#define BBOX_HALF_HEIGHT_ENEMY 79.0f
+#define BBOX_CENTER_Y_ENEMY 0.5f
+#define BBOX_HALF_WIDTH_ENEMY 0.5f
+#define BBOX_HALF_HEIGHT_ENEMY 0.5f
 #define ROWS 5
 #define COLS 5
 
@@ -115,8 +115,7 @@ namespace Galaga
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
-            //Currently for some reason it once starting to log enemy hit logs it endlessly
-            //LOG_INFO("Enemy hit!");
+            LOG_INFO("Enemy hit!");
             return;
         }
         else
