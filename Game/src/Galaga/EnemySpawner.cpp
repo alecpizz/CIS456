@@ -32,7 +32,7 @@ namespace Galaga
 
     void EnemySpawner::spawn()
     {
-        uint32_t enemy_count = 30;
+        uint32_t enemy_count = ROWS * COLS;
         uint32_t width = 1;
         uint32_t height = 1;
         while (true)
@@ -78,6 +78,7 @@ namespace Galaga
         _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
             //.sprite = _enemy_sprites["#"].get()
             });
+
         _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{
             .velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
                         _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY }
@@ -118,36 +119,28 @@ namespace Galaga
             LOG_INFO("Enemy hit!");
             return;
         }
-        else
+
+        auto r = GPEC(RigidBody2DComponent);
+        auto bb = GPEC(BoundingBoxComponent);
+        auto t = GPEC(Transform2DComponent);
+
+        auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
+        auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
+
+        if (other_entity->get_type() == Galaga::EntityType::Wall)
         {
-            auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
-            auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
-
-            auto r = GPEC(RigidBody2DComponent);
-            auto bb = GPEC(BoundingBoxComponent);
-            auto t = GPEC(Transform2DComponent);
-
-            auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
-                oe_t->translation, oe_t->scale, bb, oe_bb);
-
-            if (prev_overlap.x = 0.0f)
-            {
-                t->translation.x = t->prev_translation.x;
-                r->velocity.x *= -1.0f;
-            }
-            else if (prev_overlap.y = 0.0f)
-            {
-                t->translation.y = t->prev_translation.y;
-                r->velocity.y *= -1.0f;
-            }
-            else
-            {
-                t->translation.x = t->prev_translation.x;
-                r->velocity.x *= -1.0f;
-                t->translation.y = t->prev_translation.y;
-                r->velocity.y *= -1.0f;
-            }
+            r->velocity.x *= -1;
+            r->velocity.y *= -1;
+            return;
         }
 
+        if (other_entity->get_type() == Galaga::EntityType::Enemy)
+        {
+            auto oe_r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*other_entity);
+
+
+            return;
+        }
+        
     }
 }
