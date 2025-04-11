@@ -13,12 +13,14 @@
 #define BBOX_CENTER_Y_ENEMY 79.0f
 #define BBOX_HALF_WIDTH_ENEMY 37.0f
 #define BBOX_HALF_HEIGHT_ENEMY 79.0f
+#define ROWS 5
+#define COLS 5
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
 
 namespace Galaga
 {
-    EnemySpawner::EnemySpawner(Galaga *galaga) : _game(galaga)
+    EnemySpawner::EnemySpawner(Galaga *galaga) : _game(galaga), _rows(ROWS), _cols(COLS)
     {
         _rands.add_uniform_real_distribution("enemy_velocity", -1.0f, 2.0f);
     }
@@ -30,18 +32,63 @@ namespace Galaga
 
     void EnemySpawner::spawn()
     {
-        create_enemy_entity();
-        place_enemy_entity();
+        uint32_t enemy_count = 30;
+        uint32_t width = 1;
+        uint32_t height = 1;
+        while (true)
+        {
+            if (width * height >= enemy_count)
+            {
+                break;
+            }
+            width++;
+            if (width * height >= enemy_count)
+            {
+                break;
+            }
+            height++;
+        }
+        float buffer_x = 1.5f;
+        float buffer_y = 1.5f;
+        float enemy_width = 60;
+        float enemy_height = 60;
+        glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() / 2);
+        float x_first = origin.x - (width * enemy_width / 2) - ((width - 1) * buffer_x / 2);
+        float y_first = origin.y - (height * enemy_height / 2) - ((height - 1) * buffer_y / 2);
+
+        //assume all entites have been destroyed...?
+        _enemies.clear();
+        for (uint32_t i = 0; i < enemy_count; i++)
+        {
+            uint32_t x = i % width;
+            uint32_t y = i / width;
+            float xPos = x_first + (x * (enemy_width * buffer_x));
+            float yPos = y_first + (y * (enemy_height * buffer_y));
+            glm::vec2 pos = glm::vec2(xPos, yPos);
+
+            create_enemy_entity(pos);
+            //Go through place enemy entity and adjust the settings into create_enemy_entity gotten from spawn
+        }
     }
 
-    void EnemySpawner::create_enemy_entity()
+    void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{});
+        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
+            //.sprite = _enemy_sprites["#"].get()
+            });
+        _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{
+            .velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
+                        _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY }
+        });
+        _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{
+            .translation = pos,
+            .scale = glm::vec2(20.0f, 20.0f)
+        });
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
+            .center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY },
+            .half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY },
             .on_collided = [&](Mage::Entity* player, Mage::Entity* other, const glm::vec2 overlap)
             {
                 collision_detected(other, overlap);
@@ -57,27 +104,7 @@ namespace Galaga
                     
                 }
             });
-    }
-
-    void EnemySpawner::place_enemy_entity()
-    {
-        auto s = GPEC(SpriteComponent);
-        auto t = GPEC(Transform2DComponent);
-        auto r = GPEC(RigidBody2DComponent);
-        auto b = GPEC(BoundingBoxComponent);
-
-        //s->sprite = _enemy_sprites["#"].get();
-        r->velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
-                        _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY };
-        t->scale = { SCALE_ENEMY, SCALE_ENEMY };
-        b->center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY };
-        b->half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY };
-        //Will need to change where the enemy spawns in by changing the translation 
-        t->scale = glm::vec2(20.0f, 20.0f);
-        t->prev_translation = t->translation = {
-            (_game->get_window()->get_width() - 20.0f * 0.25f) / 2.0f,
-            (_game->get_window()->get_height() - 40.0f * 0.25f) /2.0f
-        };
+        _enemies.push_back(_enemy_entity);
     }
 
     void EnemySpawner::update(Mage::ComponentManager& componentManager, float deltaTime)
@@ -88,64 +115,40 @@ namespace Galaga
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
-            LOG_INFO("Enemy hit!");
+            //Currently for some reason it once starting to log enemy hit logs it endlessly
+            //LOG_INFO("Enemy hit!");
             return;
-        }
-
-        auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
-        auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
-
-        auto r = GPEC(RigidBody2DComponent);
-        auto bb = GPEC(BoundingBoxComponent);
-        auto t = GPEC(Transform2DComponent);
-
-        auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
-            oe_t->translation, oe_t->scale, bb, oe_bb);
-
-        if (prev_overlap.x = 0.0f)
-        {
-            t->translation.x = t->prev_translation.x;
-            r->velocity.x *= -1.0f;
-        }
-        else if (prev_overlap.y = 0.0f)
-        {
-            t->translation.y = t->prev_translation.y;
-            r->velocity.y *= -1.0f;
         }
         else
         {
-            t->translation.x = t->prev_translation.x;
-            r->velocity.x *= -1.0f;
-            t->translation.y = t->prev_translation.y;
-            r->velocity.y *= -1.0f;
+            auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
+            auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
+
+            auto r = GPEC(RigidBody2DComponent);
+            auto bb = GPEC(BoundingBoxComponent);
+            auto t = GPEC(Transform2DComponent);
+
+            auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
+                oe_t->translation, oe_t->scale, bb, oe_bb);
+
+            if (prev_overlap.x = 0.0f)
+            {
+                t->translation.x = t->prev_translation.x;
+                r->velocity.x *= -1.0f;
+            }
+            else if (prev_overlap.y = 0.0f)
+            {
+                t->translation.y = t->prev_translation.y;
+                r->velocity.y *= -1.0f;
+            }
+            else
+            {
+                t->translation.x = t->prev_translation.x;
+                r->velocity.x *= -1.0f;
+                t->translation.y = t->prev_translation.y;
+                r->velocity.y *= -1.0f;
+            }
         }
 
-        //auto push_x = true;
-        //if (prev_overlap.x > 0.0f)
-        //{	//previous position was above or below
-        //    push_x = false;
-        //}
-        //else if (prev_overlap.y < 0.0f)
-        //{	//The previous position didnt overlap in x or y, 
-        //    //push in direction of greater current overlap
-        //    push_x = overlap.x > overlap.y;
-        //}
-
-        //if (push_x && overlap.y > 0.1f)
-        //{
-        //    //Which direction is it hitting from?
-        //    t->translation.x = t->prev_translation.x;
-        //    r->velocity.x = 0.0f;
-        //}
-        //else if (overlap.x > 0.1f)
-        //{
-        //    //Which direction is it hitting from
-        //    if (r->velocity.y <= 0.0f)
-        //    {
-        //        r->velocity.y = 0.0f;
-        //    }
-        //    t->translation.y = t->prev_translation.y;
-        //    r->velocity.y = 0.0f;
-        //}
     }
 }

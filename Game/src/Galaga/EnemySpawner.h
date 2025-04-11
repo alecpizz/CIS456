@@ -25,12 +25,12 @@ namespace Galaga
         std::vector<Mage::Entity*> _enemies;
         Galaga* _game;
         Mage::Entity* _enemy_entity;
+        uint32_t _rows, _cols;
         std::map<std::string, std::shared_ptr<Mage::Sprite> > _enemy_sprites;
 
         RandomWrapper _rands;
 
-        void create_enemy_entity();
-        void place_enemy_entity();
+        void create_enemy_entity(glm::vec2 pos);
         void spawn();
     };
 }
