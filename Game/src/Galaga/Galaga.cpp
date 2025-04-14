@@ -9,7 +9,7 @@
 
 namespace Galaga
 {
-    Galaga::Galaga() : Application("Galaga", 800, 600, 0)
+    Galaga::Galaga() : Application("Galaga", 1024, 768, 0)
     {
         Mage::Log::get().set_engine_log_level(Mage::Log::Level::Info);
         get_event_manager()->controller_event_logging(true);
@@ -107,7 +107,7 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*center_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-            .translation = glm::vec2( - (static_cast<float>(get_window()->get_height() ) * 1.0f ), 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+            .translation = glm::vec2(-(static_cast<float>(get_window()->get_width()) * 0.50f) + 20.5f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
             .scale = {2000.0f, 10.0f},
             .rotation = 90.0f // 0.5f --> .rotation = 10.0f
             });
@@ -125,7 +125,7 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*left_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-            .translation = glm::vec2(-(static_cast<float>(get_window()->get_height()) * 1.0f) - 395.0f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+            .translation = glm::vec2(-(static_cast<float>(get_window()->get_width()) * 0.973f), 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
             .scale = {2000.0f, 10.0f},
             .rotation = 90.0f // 0.5f --> .rotation = 10.0f
             });
@@ -143,7 +143,7 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*right_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-            .translation = glm::vec2(-205.0f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+            .translation = glm::vec2(- (static_cast<float>(get_window()->get_width()) * 0.000007f) + 20.5f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f ///// -205, 0
             .scale = {2000.0f, 10.0f},
             .rotation = 90.0f // 0.5f --> .rotation = 10.0f
             });
