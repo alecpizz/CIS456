@@ -101,20 +101,20 @@ namespace Galaga
 
 
         //Center Wall
-        //auto center_wall = get_entity_manager()->add_entity(EntityType::Wall);
-        //get_component_manager()->add_component<BoundingBoxComponent>(*center_wall, {
-        //                                                                 .center = glm::vec2(0.5f, 0.5f),
-        //                                                                 .half_size = glm::vec2(0.5f, 0.5f)
-        //    });
-        //get_component_manager()->add_component<Transform2DComponent>(*center_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-        //    .translation = glm::vec2( - (static_cast<float>(get_window()->get_height() ) * 1.0f ), 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
-        //    .scale = {2000.0f, 10.0f},
-        //    .rotation = 90.0f // 0.5f --> .rotation = 10.0f
-        //    });
-        //get_component_manager()->add_component<ColorComponent>(*center_wall, {
-        //                                                           .color =
-        //                                                           Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-        //    });
+        auto center_wall = get_entity_manager()->add_entity(EntityType::Wall);
+        get_component_manager()->add_component<BoundingBoxComponent>(*center_wall, {
+                                                                         .center = glm::vec2(0.5f, 0.5f),
+                                                                         .half_size = glm::vec2(0.5f, 0.5f)
+            });
+        get_component_manager()->add_component<Transform2DComponent>(*center_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
+            .translation = glm::vec2(-(static_cast<float>(get_window()->get_width()) * 0.50f) + 20.5f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+            .scale = {2000.0f, 10.0f},
+            .rotation = 90.0f // 0.5f --> .rotation = 10.0f
+            });
+        get_component_manager()->add_component<ColorComponent>(*center_wall, {
+                                                                   .color =
+                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+            });
 
 
 
@@ -125,7 +125,7 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*left_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-            .translation = glm::vec2(-(static_cast<float>(get_window()->get_height()) * 1.0f) - 395.0f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+            .translation = glm::vec2(-(static_cast<float>(get_window()->get_width()) * 0.973f), 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
             .scale = {2000.0f, 10.0f},
             .rotation = 90.0f // 0.5f --> .rotation = 10.0f
             });
@@ -143,7 +143,7 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*right_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-            .translation = glm::vec2(-205.0f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+            .translation = glm::vec2(- (static_cast<float>(get_window()->get_width()) * 0.000007f) + 20.5f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f ///// -205, 0
             .scale = {2000.0f, 10.0f},
             .rotation = 90.0f // 0.5f --> .rotation = 10.0f
             });
