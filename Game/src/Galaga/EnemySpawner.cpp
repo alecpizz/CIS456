@@ -138,7 +138,7 @@ namespace Galaga
 
 
 
-            //This doesnt Work Right
+            //This doesnt Work Right doesnt detect side walls, and 
             if (overlap.y > 0.1f)
             {
                 c->color = Mage::Color::aquamarine;
@@ -151,24 +151,7 @@ namespace Galaga
                 t->translation.y = t->prev_translation.y;
                 r->velocity.y *= -1.0f;
             }
-            //This also Doesnt Work Right
-            if (other_entity->get_type() == Galaga::EntityType::Enemy)
-            {
-                auto oe_r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*other_entity);
-                auto oe_c = _game->get_component_manager()->get_component<ColorComponent>(*other_entity);
-                if (overlap.y > 0.1f)
-                {
-                    oe_c->color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f);
-                    oe_t->translation.x = t->prev_translation.x;
-                    oe_r->velocity.x *= -1.0f;
-                }
-                if (overlap.x > 0.1f)
-                {
-                    oe_c->color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f);
-                    oe_t->translation.y = t->prev_translation.y;
-                    oe_r->velocity.y *= -1.0f;
-                }
-            }
+            
         }
 
     }
