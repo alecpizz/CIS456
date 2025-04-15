@@ -7,6 +7,7 @@
 #include "../Scene/ComponentManager.h"
 #include "../Scene/SystemManager.h"
 #include "../Scene/SystemList.h"
+#include "../IO/AudioManager.h"
 
 namespace Mage
 {
@@ -35,12 +36,13 @@ namespace Mage
         std::unique_ptr<SpriteRenderer> sprite_renderer;
         std::unique_ptr<ShapeRenderer> shape_renderer;
         std::unique_ptr<Camera> camera;
+        std::unique_ptr<AudioManager> audio_manager;
         bool closing = false;
 
         void construct(const char *title, bool full_screen = true,
                        uint32_t w = 0, uint32_t h = 0, uint8_t swap_interval = 0)
         {
-            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) < 0)
+            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) < 0)
             {
                 throw Exception((std::string("Failed to initialize SDL: ") + SDL_GetError()).c_str());
             }
@@ -54,6 +56,7 @@ namespace Mage
             shape_renderer = std::unique_ptr<ShapeRenderer>(new ShapeRenderer(*camera));
             sprite_renderer = std::unique_ptr<SpriteRenderer>(new SpriteRenderer(*camera));
             text_renderer = std::unique_ptr<TextRenderer>(new TextRenderer(*window));
+            audio_manager = std::unique_ptr<AudioManager>(new AudioManager());
             component_manager->set_system_manager(*system_manager);
             entity_manager->set_system_manager(*system_manager);
             system_manager->set_component_manager(*component_manager);
@@ -124,6 +127,11 @@ namespace Mage
     ShapeRenderer *Application::get_shape_renderer() const
     {
         return _impl->shape_renderer.get();
+    }
+
+    AudioManager * Application::get_audio_manager() const
+    {
+        return _impl->audio_manager.get();
     }
 
     Camera *Application::get_camera() const
