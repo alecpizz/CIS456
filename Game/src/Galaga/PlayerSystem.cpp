@@ -80,7 +80,7 @@ namespace Galaga
             .half_size = {bullet_half_x, bullet_half_y},
             .on_collided = [&](Mage::Entity* bullet, Mage::Entity* other, const glm::vec2& overlap)
             {
-                //kill_enemy(bullet, other);
+            	kill_enemy(bullet, other);
             }
         });
     }
@@ -142,6 +142,18 @@ namespace Galaga
         }
 
         r->velocity.x *= VELOCITY_PLAYER;
+    }
+
+    void PlayerSystem::kill_enemy(Mage::Entity* bullet, Mage::Entity* other)
+    {
+        if (other->get_type() != Galaga::EntityType::Enemy)
+        {
+            return;
+        }
+
+        bullet->destroy();
+        other->destroy();
+        //TODO: kill count
     }
 
     void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
