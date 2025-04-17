@@ -19,7 +19,7 @@ namespace Galaga
 
         void initialize();
         void update(Mage::ComponentManager &componentManager, float deltaTime) override;
-        void collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap);
+        void collision_detected(Mage::Entity* enemy, Mage::Entity* other_entity, const glm::vec2& overlap);
 
     private:
         std::vector<Mage::Entity*> _enemies;

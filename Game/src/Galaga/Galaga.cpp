@@ -52,7 +52,7 @@ namespace Galaga
 
 
 
-        // basic wall for testing
+        // basic wall for testing --> The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);
         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
                                                                          .center = glm::vec2(0.5f, 0.5f),
@@ -63,7 +63,96 @@ namespace Galaga
                                                                    .color =
                                                                    Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
             });
+
+
+        
+        // Fortnite Boxing
+        // Top Wall
+        auto top_wall = get_entity_manager()->add_entity(EntityType::Wall);
+        get_component_manager()->add_component<BoundingBoxComponent>(*top_wall, {
+                                                                         .center = glm::vec2(0.5f, 0.5f),
+                                                                         .half_size = glm::vec2(0.5f, 0.5f)
+            });
+        get_component_manager()->add_component<Transform2DComponent>(*top_wall, {
+            .translation = glm::vec2(0.0f, static_cast<float>(get_window()->get_height()) - 10.0f  ),
+            .scale = {2000.0f, 10.0f}
+            });
+        get_component_manager()->add_component<ColorComponent>(*top_wall, {
+                                                                   .color =
+                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+            });
+
+
+
+        //Divider between Enemies and Player
+        auto divider_wall = get_entity_manager()->add_entity(EntityType::Wall);
+        get_component_manager()->add_component<BoundingBoxComponent>(*divider_wall, {
+                                                                         .center = glm::vec2(0.5f, 0.5f),
+                                                                         .half_size = glm::vec2(0.5f, 0.5f)
+            });
+        get_component_manager()->add_component<Transform2DComponent>(*divider_wall, {
+            .translation = glm::vec2(0.0f, static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f,
+            .scale = {2000.0f, 10.0f}
+            });
+        get_component_manager()->add_component<ColorComponent>(*divider_wall, {
+                                                                   .color =
+                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+            });
+
+
+        ////Center Wall
+        //auto center_wall = get_entity_manager()->add_entity(EntityType::Wall);
+        //get_component_manager()->add_component<BoundingBoxComponent>(*center_wall, {
+        //                                                                 .center = glm::vec2(0.5f, 0.5f),
+        //                                                                 .half_size = glm::vec2(0.5f, 0.5f)
+        //    });
+        //get_component_manager()->add_component<Transform2DComponent>(*center_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
+        //    .translation = glm::vec2(-(static_cast<float>(get_window()->get_width()) * 0.50f) + 20.5f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
+        //    .scale = {2000.0f, 10.0f},
+        //    .rotation = 90.0f // 0.5f --> .rotation = 10.0f
+        //    });
+        //get_component_manager()->add_component<ColorComponent>(*center_wall, {
+        //                                                           .color =
+        //                                                           Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //    });
+
+
+
+        //Left Wall
+        auto left_wall = get_entity_manager()->add_entity(EntityType::Wall);
+        get_component_manager()->add_component<BoundingBoxComponent>(*left_wall, {
+                                                                         .center = glm::vec2(0.5f, 0.5f),
+                                                                         .half_size = glm::vec2(0.5f, 0.5f)
+            });
+        get_component_manager()->add_component<Transform2DComponent>(*left_wall, {
+            .translation = glm::vec2(0.0f, 0.0f),
+            .scale = {10.0f, 2000.0f}
+            });
+        get_component_manager()->add_component<ColorComponent>(*left_wall, {
+                                                                   .color =
+                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+            });
+
+
+
+        //Right Wall --> WORKS
+        auto right_wall = get_entity_manager()->add_entity(EntityType::Wall);
+        get_component_manager()->add_component<BoundingBoxComponent>(*right_wall, {
+                                                                         .center = glm::vec2(0.5f, 0.5f),
+                                                                         .half_size = glm::vec2(0.5f, 0.5f)
+            });
+        get_component_manager()->add_component<Transform2DComponent>(*right_wall, {
+            .translation = glm::vec2(static_cast<float>(get_window()->get_width()) - 10, 0.0f),
+            .scale = {10.0f, 2000.0f}
+            });
+        get_component_manager()->add_component<ColorComponent>(*right_wall, {
+                                                                   .color =
+                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+            });
     }
+
+
+
 
     void Galaga::on_app_closing()
     {
