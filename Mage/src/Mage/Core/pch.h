@@ -50,5 +50,5 @@
 #include <GLM/gtx/euler_angles.hpp>
 
 #include "stb_image.h"
-
+#include "miniaudio.h"
 #pragma warning( pop )

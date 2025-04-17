@@ -51,7 +51,9 @@ add_library(
  "src/Mage/Scene/System.cpp"
  "src/Mage/Scene/SystemList.h"
  "src/Mage/Scene/SystemList.cpp"
- "src/Mage/Core/Exception.cpp"  )
+ "src/Mage/Core/Exception.cpp"
+ "src/Mage/IO/AudioManager.h"
+ "src/Mage/IO/AudioManager.cpp")
 
 target_include_directories(
  "Mage" PUBLIC
@@ -62,7 +64,7 @@ target_include_directories(
  "./3rd_party/freetype/include"
  "./3rd_party/glm/include"
  "./3rd_party/stb_image/include"
- "./"
+ "./3rd_party/miniaudio/include"
 )
 
 target_precompile_headers( "Mage" PRIVATE "src/Mage/Core/pch.h" )

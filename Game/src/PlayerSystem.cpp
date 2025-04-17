@@ -111,6 +111,7 @@ void PlayerSystem::add_bullet()
                                                                                 kill_enemy(bullet, other);
                                                                             }
                                                                         });
+    _game->get_audio_manager()->play_sound("gunshot");
 }
 
 void PlayerSystem::create_player_entity()
@@ -135,6 +136,7 @@ void PlayerSystem::create_player_entity()
                                                       .on_destroyed = [&]()
                                                       {
                                                           _deaths++;
+                                                          _game->get_audio_manager()->play_sound("death");
                                                           spawn();
                                                       }
                                                   });
@@ -328,6 +330,7 @@ void PlayerSystem::kill_enemy(Mage::Entity *bullet, Mage::Entity *other)
         return;
     }
 
+    _game->get_audio_manager()->play_sound("enemy_death");
     bullet->destroy();
     other->destroy();
     //TODO: kill count
