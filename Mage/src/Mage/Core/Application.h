@@ -22,6 +22,8 @@ namespace Mage
 
     class ShapeRenderer;
 
+    class AudioManager;
+
     class MAGE_API Application
     {
     public:
@@ -54,6 +56,8 @@ namespace Mage
         SpriteRenderer *get_sprite_renderer() const;
 
         ShapeRenderer *get_shape_renderer() const;
+
+        AudioManager *get_audio_manager() const;
         Camera *get_camera() const;
 
         void close();

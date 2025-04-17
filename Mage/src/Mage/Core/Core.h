@@ -9,7 +9,6 @@
 #endif
 
 #include "pch.h"
-
 #include "Log.h"
 #include "Exception.h"
 #include "Window.h"
