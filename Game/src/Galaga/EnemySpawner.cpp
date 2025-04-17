@@ -13,6 +13,13 @@
 #define BBOX_CENTER_Y_ENEMY 0.5f
 #define BBOX_HALF_WIDTH_ENEMY 0.5f
 #define BBOX_HALF_HEIGHT_ENEMY 0.5f
+#define BULLET_PROBABILITY 0.01f
+#define MAX_FIRST_THROW_DELAY 2.0f
+#define MIN_TIME_BETWEEN_BULLET 3.0f
+#define VELOCITY_BULLET 400.0f
+#define SCALE_BULLET 10.0f
+#define LIFETIME_BULLET 5.0f
+#define BULLET_X_VELOCITY 150.0f
 #define ROWS 5
 #define COLS 5
 
@@ -23,6 +30,9 @@ namespace Galaga
     EnemySpawner::EnemySpawner(Galaga *galaga) : _game(galaga), _rows(ROWS), _cols(COLS)
     {
         _rands.add_uniform_real_distribution("enemy_velocity", -1.0f, 2.0f);
+        _rands.add_uniform_real_distribution("bullet_probability", 0.0f, 1.0f);
+        _rands.add_uniform_real_distribution("bullet_x_velocity", -BULLET_X_VELOCITY, BULLET_X_VELOCITY);
+        _rands.add_uniform_real_distribution("first_throw_delay", 0.0f, MAX_FIRST_THROW_DELAY);
     }
 
     void EnemySpawner::initialize()
@@ -74,18 +84,21 @@ namespace Galaga
     void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
-        _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent{});
+        _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent
+            {
+                .first_throw_delay = _rands.get_uniform_real("first_throw_delay")
+        });
         _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
             //.sprite = _enemy_sprites["#"].get()
             });
         _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{
             .velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
                         _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY }
-        });
+            });
         _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{
             .translation = pos,
             .scale = glm::vec2(20.0f, 20.0f)
-        });
+            });
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
             .center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY },
             .half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY },
@@ -101,14 +114,10 @@ namespace Galaga
                 .on_destroyed = [&]()
                 {
                 //TODO: Do Something? Or not
-                    
+
                 }
             });
         _enemies.push_back(_enemy_entity);
-    }
-
-    void EnemySpawner::update(Mage::ComponentManager& componentManager, float deltaTime)
-    {
     }
 
     void EnemySpawner::collision_detected(Mage::Entity* enemy, Mage::Entity* other_entity, const glm::vec2& overlap)
@@ -153,4 +162,76 @@ namespace Galaga
         }
 
     }
+
+    void EnemySpawner::shoot()
+    {
+	    
+    }
+
+    void EnemySpawner::update(Mage::ComponentManager& componentManager, float delta_time)
+    {
+        Mage::EntityList enemy_list = _game->get_entity_manager()->get_all_entities_by_type(Galaga::EntityType::Enemy);
+        for (auto e : enemy_list)
+        {
+            //This is where we will set up the enemies shooting.
+            //set it up the same way as the frequency of bats spawning
+            //in the in class game, also set up angle of shooting to be random
+            auto ec = _game->get_component_manager()->get_component<EnemyComponent>(*e);
+            ec->last_bullet += delta_time;
+            ec->first_throw_delay -= delta_time;
+
+            if (ec->last_bullet >= MIN_TIME_BETWEEN_BULLET
+                && _rands.get_uniform_real("bullet_probability") < BULLET_PROBABILITY 
+                && ec->first_throw_delay <= 0.0f)
+            {
+                ec->last_bullet = 0.0f;
+
+                //This is the spawn bullet logic
+                auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
+                auto eb = _game->get_entity_manager()->add_entity(Galaga::EntityType::Bullet);
+                //_game->get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = _player_sprites["bullet"].get() });
+                _game->get_component_manager()->add_component<ColorComponent>(*eb,
+                    {
+                       .color = Mage::Color::custom(0.7f, 0.7f, 0.0f, 0.7f)
+                    });
+                _game->get_component_manager()->add_component<RigidBody2DComponent>(*eb,
+                    {
+                        //use _rands to change x for angles
+                            .velocity = {_rands.get_uniform_real("bullet_x_velocity"), -VELOCITY_BULLET}
+                    });
+                _game->get_component_manager()->add_component<Transform2DComponent>(*eb,
+                    {
+                        .translation = {t->translation.x - 7.5f, t->translation.y - 20.0f},
+                        .scale = {SCALE_BULLET, SCALE_BULLET}
+                    });
+                _game->get_component_manager()->add_component<LifetimeComponent>(*eb,
+                    {
+                        .remaining = LIFETIME_BULLET
+                    });
+                auto bullet_half_x = 0.5f;
+                auto bullet_half_y = 0.5f;
+                _game->get_component_manager()->add_component<BoundingBoxComponent>(*eb, {
+                    .center = {bullet_half_x, bullet_half_y},
+                    .half_size = {bullet_half_x, bullet_half_y},
+                    .on_collided = [&](Mage::Entity* bullet, Mage::Entity* other, const glm::vec2& overlap)
+                    {
+                        //kill_player(bullet, other);
+                    }
+                    });
+            }
+        }
+    }
+
+    void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
+    {
+        if (other->get_type() != Galaga::EntityType::Player)
+        {
+            return;
+        }
+
+        bullet->destroy();
+        other->destroy();
+        //TODO: kill count
+    }
+
 }

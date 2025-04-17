@@ -18,7 +18,7 @@ namespace Galaga
         EnemySpawner& operator=(const EnemySpawner&) = delete;
 
         void initialize();
-        void update(Mage::ComponentManager &componentManager, float deltaTime) override;
+        void update(Mage::ComponentManager &componentManager, float delta_time) override;
         void collision_detected(Mage::Entity* enemy, Mage::Entity* other_entity, const glm::vec2& overlap);
 
     private:
@@ -30,7 +30,10 @@ namespace Galaga
 
         RandomWrapper _rands;
 
+        void shoot();
+
         void create_enemy_entity(glm::vec2 pos);
         void spawn();
+        void kill_player(Mage::Entity* bullet, Mage::Entity* other);
     };
 }
