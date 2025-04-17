@@ -32,5 +32,18 @@ namespace Galaga
 
         void create_enemy_entity(glm::vec2 pos);
         void spawn();
+
+
+        //Working on shooting
+        bool _shooting = false;
+        float _last_shot = 0.0f;
+        //float _enemy_shooting_rate = 0.0f;
+
+
+        void shoot();
+
+        void add_bullet();
+
+        void kill_player(Mage::Entity* bullet, Mage::Entity* other);
     };
 }
