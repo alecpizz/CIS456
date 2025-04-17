@@ -75,9 +75,9 @@ namespace Galaga
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent{});
-        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
+        //_game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
             //.sprite = _enemy_sprites["#"].get()
-            });
+        //    });
         _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{
             .velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
                         _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY }
