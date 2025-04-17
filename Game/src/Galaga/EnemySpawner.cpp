@@ -8,11 +8,11 @@
 #define VELOCITY_ENEMY 50.0f
 #define SCALE_ENEMY 0.5f
 #define OFFSET_ENEMY_CENTER 24.0f
-#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 47.0f
+#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
 #define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
-#define BBOX_CENTER_Y_ENEMY 79.0f
-#define BBOX_HALF_WIDTH_ENEMY 37.0f
-#define BBOX_HALF_HEIGHT_ENEMY 79.0f
+#define BBOX_CENTER_Y_ENEMY 0.5f
+#define BBOX_HALF_WIDTH_ENEMY 0.5f
+#define BBOX_HALF_HEIGHT_ENEMY 0.5f
 #define ROWS 5
 #define COLS 5
 
@@ -32,7 +32,7 @@ namespace Galaga
 
     void EnemySpawner::spawn()
     {
-        uint32_t enemy_count = 30;
+        uint32_t enemy_count = ROWS * COLS;
         uint32_t width = 1;
         uint32_t height = 1;
         while (true)
@@ -67,7 +67,7 @@ namespace Galaga
             glm::vec2 pos = glm::vec2(xPos, yPos);
 
             create_enemy_entity(pos);
-            //Go through place enemy entity and adjust the settings into create_enemy_entity gotten from spawn
+            
         }
     }
 
@@ -89,9 +89,9 @@ namespace Galaga
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
             .center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY },
             .half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY },
-            .on_collided = [&](Mage::Entity* player, Mage::Entity* other, const glm::vec2 overlap)
+            .on_collided = [&](Mage::Entity* enemy, Mage::Entity* other, const glm::vec2 overlap)
             {
-                collision_detected(other, overlap);
+                collision_detected(enemy, other, overlap);
             } });
         _game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
                .color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f)
@@ -111,43 +111,45 @@ namespace Galaga
     {
     }
 
-    void EnemySpawner::collision_detected(Mage::Entity* other_entity, const glm::vec2& overlap)
+    void EnemySpawner::collision_detected(Mage::Entity* enemy, Mage::Entity* other_entity, const glm::vec2& overlap)
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
-            //Currently for some reason it once starting to log enemy hit logs it endlessly
-            //LOG_INFO("Enemy hit!");
+            LOG_INFO("Enemy hit!");
             return;
         }
-        else
+
+        if (other_entity->get_type() == Galaga::EntityType::Wall || other_entity->get_type() == Galaga::EntityType::Enemy)
         {
+            //LOG_INFO("Enemy Hit Wall.");
             auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
             auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
+            
 
-            auto r = GPEC(RigidBody2DComponent);
-            auto bb = GPEC(BoundingBoxComponent);
-            auto t = GPEC(Transform2DComponent);
-
+            //GPEC Cannot be used below otherwise collision will only apply to the last generated enemy
+            auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*enemy);
+            auto bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*enemy);
+            auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*enemy);
+            auto c = _game->get_component_manager()->get_component<ColorComponent>(*enemy);
+            
             auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
                 oe_t->translation, oe_t->scale, bb, oe_bb);
 
-            if (prev_overlap.x = 0.0f)
+            //Need to look into enemies hitting other enemies from behind.
+            //They even if hit from behind flip backwards
+            if (prev_overlap.y > 0.1f)
             {
+                c->color = Mage::Color::aquamarine;
                 t->translation.x = t->prev_translation.x;
-                r->velocity.x *= -1.0f;
+                r->velocity.x *= -1.0f ;
             }
-            else if (prev_overlap.y = 0.0f)
+            if (prev_overlap.x > 0.1f)
             {
+                c->color = Mage::Color::magenta;
                 t->translation.y = t->prev_translation.y;
                 r->velocity.y *= -1.0f;
             }
-            else
-            {
-                t->translation.x = t->prev_translation.x;
-                r->velocity.x *= -1.0f;
-                t->translation.y = t->prev_translation.y;
-                r->velocity.y *= -1.0f;
-            }
+            
         }
 
     }
