@@ -50,7 +50,15 @@ namespace Galaga
         _player_system->initialize();
         _enemy_spawning_system->initialize();
 
-
+        get_audio_manager()->set_mixer_group_volume("music", 0.05f);
+        get_audio_manager()->set_mixer_group_volume("effects", 1.0f);
+        get_audio_manager()->load_sound("player_shoot", "effects", "res/sounds/whoosh.mp3");
+        get_audio_manager()->load_sound("enemy_shoot", "effects", "res/sounds/whoosh.mp3");
+        // get_audio_manager()->load_sound("player_death", "effects", "res/sounds/player_shoot.mp3");
+        get_audio_manager()->load_sound("enemy_collide", "effects", "res/sounds/wet_slap.mp3");
+        get_audio_manager()->load_sound("enemy_death", "effects", "res/sounds/short_yell.mp3");
+        get_audio_manager()->load_sound("game_music", "music", "res/sounds/synth.mp3");
+        get_audio_manager()->play_sound("game_music");
 
         // basic wall for testing --> The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);

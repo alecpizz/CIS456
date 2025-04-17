@@ -149,7 +149,7 @@ namespace Galaga
                 t->translation.y = t->prev_translation.y;
                 r->velocity.y *= -1.0f;
             }
-            
+            _game->get_audio_manager()->play_sound("enemy_collide");
         }
 
     }
