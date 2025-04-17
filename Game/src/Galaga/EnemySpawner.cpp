@@ -135,16 +135,15 @@ namespace Galaga
             auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
                 oe_t->translation, oe_t->scale, bb, oe_bb);
 
-
-
-            //This doesnt Work Right doesnt detect side walls, and 
-            if (overlap.y > 0.1f)
+            //Need to look into enemies hitting other enemies from behind.
+            //They even if hit from behind flip backwards
+            if (prev_overlap.y > 0.1f)
             {
                 c->color = Mage::Color::aquamarine;
                 t->translation.x = t->prev_translation.x;
                 r->velocity.x *= -1.0f ;
             }
-            if (overlap.x > 0.1f)
+            if (prev_overlap.x > 0.1f)
             {
                 c->color = Mage::Color::magenta;
                 t->translation.y = t->prev_translation.y;
