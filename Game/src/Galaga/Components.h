@@ -65,4 +65,9 @@ namespace Galaga
     {
         std::function<void()> on_destroyed = nullptr;
     };
+
+	struct ScoreComponent
+	{
+		uint32_t current = 0;
+	};
 }

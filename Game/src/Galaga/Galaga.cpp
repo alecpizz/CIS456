@@ -30,6 +30,7 @@ namespace Galaga
         get_component_manager()->register_component<BoundingBoxComponent>();
         get_component_manager()->register_component<LifetimeComponent>();
         get_component_manager()->register_component<DestructionNotificationComponent>();
+        get_component_manager()->register_component<ScoreComponent>();
 
         _shape_rendering_system = std::make_unique<ShapeRenderingSystem>(*get_shape_renderer());
         _movement_system = std::make_unique<MovementSystem>();
@@ -37,6 +38,7 @@ namespace Galaga
         _player_system = std::make_unique<PlayerSystem>(this);
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
+		_score_system = std::make_unique<ScoreSystem>(this);
 
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
@@ -46,11 +48,11 @@ namespace Galaga
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_spawning_system);
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
         get_system_manager()->register_system<BoundingBoxComponent, Transform2DComponent>(*_collision_system);
+		get_system_manager()->register_system<ScoreComponent>(*_score_system);
 
         _player_system->initialize();
         _enemy_spawning_system->initialize();
-
-
+		_score_system->set_player_entity(_player_system->get_player_entity());
 
         // basic wall for testing --> The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);

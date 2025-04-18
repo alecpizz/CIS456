@@ -39,6 +39,8 @@ namespace Galaga
 
         void collision_detected(Mage::Entity* other_entity);
 
+        Mage::Entity* get_player_entity() const;
+
     private:
         Galaga* _game;
         Mage::Entity* _player_entity;
