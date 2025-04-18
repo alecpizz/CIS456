@@ -7,10 +7,17 @@ endif()
 add_executable(
  "Game" ${EXECUTABLE_TYPE_WIN32}
  "src/main.cpp"
- "src/Game.cpp"
+ "src/Game.cpp" "src/Galaga/Galaga.cpp"
  "src/PlayerSystem.cpp"
  "src/DeathByYSystem.cpp"
- "src/CollisionSystem.cpp" "src/DestructionNotificationSystem.h" "src/EnemySpawningSystem.h" "src/EnemySpawningSystem.cpp" "src/SpriteRenderingSystem.h" )
+ "src/CollisionSystem.cpp" "src/DestructionNotificationSystem.h"
+ "src/EnemySpawningSystem.h" "src/EnemySpawningSystem.cpp"
+ "src/SpriteRenderingSystem.h" "src/Galaga/PlayerSystem.cpp"
+ "src/Galaga/ShapeRenderingSystem.h" "src/Galaga/MovementSystem.h" 
+ "src/Galaga/LifetimeSystem.h" 
+ "src/Galaga/EnemySpawner.h" "src/Galaga/EnemySpawner.cpp"
+ "src/Galaga/CollisionSystem.cpp" "src/Galaga/CollisionSystem.h" 
+ "src/Galaga/RandomWrapper.h" "src/Galaga/ScoreSystem.cpp")
 
 set_property( TARGET "Game" PROPERTY LINKER_LANGUAGE CXX )
 set_property( TARGET "Game" PROPERTY CXX_STANDARD 20)
