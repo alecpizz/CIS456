@@ -35,6 +35,7 @@ namespace Galaga
         _movement_system = std::make_unique<MovementSystem>();
         _collision_system = std::make_unique<CollisionSystem>(*this);
         _player_system = std::make_unique<PlayerSystem>(this);
+        _sprite_rendering_system = std::make_unique<SpriteRenderingSystem>(*get_sprite_renderer());
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
 
@@ -42,6 +43,7 @@ namespace Galaga
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
         get_system_manager()->register_system<PlayerComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_player_system);
+        get_system_manager()->register_system<SpriteComponent, Transform2DComponent>(*_sprite_rendering_system);
         get_system_manager()->register_system<EnemyComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_spawning_system);
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
