@@ -35,6 +35,7 @@ namespace Galaga
         _movement_system = std::make_unique<MovementSystem>();
         _collision_system = std::make_unique<CollisionSystem>(*this);
         _player_system = std::make_unique<PlayerSystem>(this);
+        _sprite_rendering_system = std::make_unique<SpriteRenderingSystem>(*get_sprite_renderer());
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
 
@@ -42,6 +43,7 @@ namespace Galaga
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
         get_system_manager()->register_system<PlayerComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_player_system);
+        get_system_manager()->register_system<SpriteComponent, Transform2DComponent>(*_sprite_rendering_system);
         get_system_manager()->register_system<EnemyComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_spawning_system);
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
@@ -106,24 +108,6 @@ namespace Galaga
                                                                    .color =
                                                                    Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
             });
-
-
-        ////Center Wall
-        //auto center_wall = get_entity_manager()->add_entity(EntityType::Wall);
-        //get_component_manager()->add_component<BoundingBoxComponent>(*center_wall, {
-        //                                                                 .center = glm::vec2(0.5f, 0.5f),
-        //                                                                 .half_size = glm::vec2(0.5f, 0.5f)
-        //    });
-        //get_component_manager()->add_component<Transform2DComponent>(*center_wall, { //static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f
-        //    .translation = glm::vec2(-(static_cast<float>(get_window()->get_width()) * 0.50f) + 20.5f, 0.0f), // .translation = glm::vec2(100.5f, 300.0f), --> 10.0f
-        //    .scale = {2000.0f, 10.0f},
-        //    .rotation = 90.0f // 0.5f --> .rotation = 10.0f
-        //    });
-        //get_component_manager()->add_component<ColorComponent>(*center_wall, {
-        //                                                           .color =
-        //                                                           Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-        //    });
-
 
 
         //Left Wall
