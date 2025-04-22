@@ -5,25 +5,18 @@
 
 #include "Galaga.h"
 
-#define VELOCITY_ENEMY 50.0f
-#define SCALE_ENEMY 0.15f
-#define OFFSET_ENEMY_CENTER 24.0f
-#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
-#define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
-#define BBOX_CENTER_Y_ENEMY 20.0f
-#define BBOX_HALF_WIDTH_ENEMY 20.0f
-#define BBOX_HALF_HEIGHT_ENEMY 20.0f
-#define BULLET_PROBABILITY 0.01f
-#define MAX_FIRST_THROW_DELAY 2.0f
+#define VELOCITY_ENEMY          50.0f
+#define SCALE_ENEMY             0.15f
+#define BULLET_PROBABILITY      0.01f
+#define MAX_FIRST_THROW_DELAY   2.0f
 #define MIN_TIME_BETWEEN_BULLET 3.0f
-#define VELOCITY_BULLET 400.0f
-#define SCALE_BULLET 0.5f
-#define LIFETIME_BULLET 5.0f
-#define BULLET_X_VELOCITY 150.0f
-#define ROWS 3
-#define COLS 5
+#define VELOCITY_BULLET         400.0f
+#define SCALE_BULLET            0.5f
+#define LIFETIME_BULLET         5.0f
+#define BULLET_X_VELOCITY       150.0f
+#define ROWS                    3
+#define COLS                    5
 
-#define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
 
 namespace Galaga
 {
@@ -103,13 +96,13 @@ namespace Galaga
             });
         _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{
             .translation = pos,
-            .scale = glm::vec2(SCALE_ENEMY, SCALE_ENEMY)
+            .scale = glm::vec2(SCALE_ENEMY, SCALE_ENEMY )
             });
-        auto enemy_half_x = static_cast<float>(sprite->get_width())  * SCALE_ENEMY;
-        auto enemy_half_y = static_cast<float>(sprite->get_height())  * SCALE_ENEMY;
+        auto enemy_half_x = static_cast<float>(sprite->get_width() * SCALE_ENEMY) ;
+        auto enemy_half_y = static_cast<float>(sprite->get_height() * SCALE_ENEMY) ;
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
-            .center = { enemy_half_x, enemy_half_y },
-            .half_size = { enemy_half_x, enemy_half_y },
+            .center = { enemy_half_x + 85, enemy_half_y + 70 },
+            .half_size = { enemy_half_x + 40, enemy_half_y + 80},
             .on_collided = [&](Mage::Entity* enemy, Mage::Entity* other, const glm::vec2 overlap)
             {
                 collision_detected(enemy, other, overlap);
@@ -142,7 +135,6 @@ namespace Galaga
             auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
             auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
             
-            //GPEC Cannot be used below otherwise collision will only apply to the last generated enemy
             auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*enemy);
             auto bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*enemy);
             auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*enemy);
