@@ -45,6 +45,8 @@ private:
     std::unique_ptr<EnemySpawningSystem> _enemy_spawning_system = nullptr;
     std::unique_ptr<DestructionNotificationSystem> _destruction_notification_system = nullptr;
     std::map<std::string, std::shared_ptr<Mage::Sprite> > _game_sprites;
+    uint32_t _current_bg_music = 0;
+    static void bg_music_cycle(void* game);
     RandomWrapper _rands;
     void on_app_closing() override;
     void add_random_shape();
