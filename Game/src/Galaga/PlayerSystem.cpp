@@ -218,13 +218,5 @@ namespace Galaga
         {
             return;
         }
-
-        if (other_entity->get_type() == Galaga::EntityType::Wall)
-        {
-            auto r = GPEC(RigidBody2DComponent);
-            r->velocity = {0.0f, 0.0f};
-            LOG_INFO("WALL");
-            return;
-        }
     }
 }
