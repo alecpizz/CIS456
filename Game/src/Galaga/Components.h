@@ -46,8 +46,8 @@ namespace Galaga
 
     struct EnemyComponent
     {
-        float enemy_shooting_rate = 0.0f;
-        float last_bullet = 0.0f;
+        float last_bullet = 3.0f;
+        float first_throw_delay = 0.0f;
     };
 
     struct BoundingBoxComponent
