@@ -5,7 +5,7 @@ namespace Galaga {
 
 	ScoreSystem::ScoreSystem(Galaga* galaga) : _game(galaga)
 	{
-		_font = std::make_unique<Mage::Font>("res/fonts/OpenSans-Regular.ttf");
+		_font = std::make_unique<Mage::Font>("res/fonts/Joystix-Monospace.ttf");
 	}
 
 	void ScoreSystem::update(Mage::ComponentManager& component_manager, float delta_time)
