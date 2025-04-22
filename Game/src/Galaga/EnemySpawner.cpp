@@ -6,13 +6,13 @@
 #include "Galaga.h"
 
 #define VELOCITY_ENEMY 50.0f
-#define SCALE_ENEMY 0.5f
+#define SCALE_ENEMY 0.15f
 #define OFFSET_ENEMY_CENTER 24.0f
 #define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
 #define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
-#define BBOX_CENTER_Y_ENEMY 0.5f
-#define BBOX_HALF_WIDTH_ENEMY 0.5f
-#define BBOX_HALF_HEIGHT_ENEMY 0.5f
+#define BBOX_CENTER_Y_ENEMY 20.0f
+#define BBOX_HALF_WIDTH_ENEMY 20.0f
+#define BBOX_HALF_HEIGHT_ENEMY 20.0f
 #define BULLET_PROBABILITY 0.01f
 #define MAX_FIRST_THROW_DELAY 2.0f
 #define MIN_TIME_BETWEEN_BULLET 3.0f
@@ -37,13 +37,11 @@ namespace Galaga
 
     void EnemySpawner::initialize()
     {
-        spawn();
-
         //create sprite
         _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
         _enemy_sprites["penguin"] = std::make_shared<Mage::Sprite>("res/sprites/penguin.png", 1, 0.0f);
         _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
-
+        spawn();
     }
 
     void EnemySpawner::spawn()
@@ -90,32 +88,35 @@ namespace Galaga
     void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
-        //_enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguin"].get());
+        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguin"].get());
+        auto sprite = _enemy_instances[_enemy_entity->get_id()].get();
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent
             {
                 .first_throw_delay = _rands.get_uniform_real("first_throw_delay")
         });
-        /*_game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
-            .sprite = _enemy_instances[_enemy_entity->get_id()].get()
-            });*/
+        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
+            .sprite = sprite
+            });
         _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{
             .velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
                         _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY }
             });
         _game->get_component_manager()->add_component(*_enemy_entity, Transform2DComponent{
             .translation = pos,
-            .scale = glm::vec2(20.0f, 20.0f)
+            .scale = glm::vec2(SCALE_ENEMY, SCALE_ENEMY)
             });
+        auto enemy_half_x = static_cast<float>(sprite->get_width())  * SCALE_ENEMY;
+        auto enemy_half_y = static_cast<float>(sprite->get_height())  * SCALE_ENEMY;
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
-            .center = { BBOX_RIGHT_FACING_CENTER_X_ENEMY, BBOX_CENTER_Y_ENEMY },
-            .half_size = { BBOX_HALF_WIDTH_ENEMY, BBOX_HALF_HEIGHT_ENEMY },
+            .center = { enemy_half_x, enemy_half_y },
+            .half_size = { enemy_half_x, enemy_half_y },
             .on_collided = [&](Mage::Entity* enemy, Mage::Entity* other, const glm::vec2 overlap)
             {
                 collision_detected(enemy, other, overlap);
             } });
-        _game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
+        /*_game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
                .color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f)
-            });
+            });*/
         _game->get_component_manager()->add_component(*_enemy_entity, DestructionNotificationComponent
             {
                 .on_destroyed = [&]()
@@ -141,33 +142,31 @@ namespace Galaga
             auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
             auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
             
-
             //GPEC Cannot be used below otherwise collision will only apply to the last generated enemy
             auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*enemy);
             auto bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*enemy);
             auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*enemy);
-            auto c = _game->get_component_manager()->get_component<ColorComponent>(*enemy);
+            //auto c = _game->get_component_manager()->get_component<ColorComponent>(*enemy);
             
             auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
                 oe_t->translation, oe_t->scale, bb, oe_bb);
 
             //Need to look into enemies hitting other enemies from behind.
             //They even if hit from behind flip backwards
+            //c-color is only used when we have a color component instead of sprite
             if (prev_overlap.y > 0.1f)
             {
-                c->color = Mage::Color::aquamarine;
+                //c->color = Mage::Color::aquamarine;
                 t->translation.x = t->prev_translation.x;
                 r->velocity.x *= -1.0f ;
             }
             if (prev_overlap.x > 0.1f)
             {
-                c->color = Mage::Color::magenta;
+                //c->color = Mage::Color::magenta;
                 t->translation.y = t->prev_translation.y;
                 r->velocity.y *= -1.0f;
             }
-            
         }
-
     }
 
     void EnemySpawner::shoot(float delta_time)
