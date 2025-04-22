@@ -123,12 +123,13 @@ namespace Galaga
 
     void PlayerSystem::update_player_velocity(RigidBody2DComponent* r, Transform2DComponent* t, float delta_time)
     {
+        auto s = GPEC(SpriteComponent);
         r->velocity.x = 0.0f;
         if (_wasd_states & 0x02 && t->translation.x > 0.0f)
         {
             r->velocity.x += -1.0f;
         }
-        if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - 20.0f)
+        if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - s->sprite->get_width() * SCALE_PLAYER)
         {
             r->velocity.x += 1.0f;
         }
