@@ -27,10 +27,11 @@ namespace Galaga
         Mage::Entity* _enemy_entity;
         uint32_t _rows, _cols;
         std::map<std::string, std::shared_ptr<Mage::Sprite> > _enemy_sprites;
+        std::map<uint64_t, std::unique_ptr<Mage::Sprite>> _enemy_instances;
 
         RandomWrapper _rands;
 
-        void shoot();
+        void shoot(float delta_time);
 
         void create_enemy_entity(glm::vec2 pos);
         void spawn();

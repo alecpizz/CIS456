@@ -17,10 +17,10 @@
 #define MAX_FIRST_THROW_DELAY 2.0f
 #define MIN_TIME_BETWEEN_BULLET 3.0f
 #define VELOCITY_BULLET 400.0f
-#define SCALE_BULLET 10.0f
+#define SCALE_BULLET 0.5f
 #define LIFETIME_BULLET 5.0f
 #define BULLET_X_VELOCITY 150.0f
-#define ROWS 5
+#define ROWS 3
 #define COLS 5
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
@@ -38,6 +38,12 @@ namespace Galaga
     void EnemySpawner::initialize()
     {
         spawn();
+
+        //create sprite
+        _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
+        _enemy_sprites["penguin"] = std::make_shared<Mage::Sprite>("res/sprites/penguin.png", 1, 0.0f);
+        _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
+
     }
 
     void EnemySpawner::spawn()
@@ -58,11 +64,11 @@ namespace Galaga
             }
             height++;
         }
-        float buffer_x = 1.5f;
-        float buffer_y = 1.5f;
+        float buffer_x = 1.0f;
+        float buffer_y = 1.0f;
         float enemy_width = 60;
         float enemy_height = 60;
-        glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() / 2);
+        glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() - _game->get_window()->get_height()/4);
         float x_first = origin.x - (width * enemy_width / 2) - ((width - 1) * buffer_x / 2);
         float y_first = origin.y - (height * enemy_height / 2) - ((height - 1) * buffer_y / 2);
 
@@ -84,13 +90,14 @@ namespace Galaga
     void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
+        //_enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguin"].get());
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent
             {
                 .first_throw_delay = _rands.get_uniform_real("first_throw_delay")
         });
-        _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
-            //.sprite = _enemy_sprites["#"].get()
-        //    });
+        /*_game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
+            .sprite = _enemy_instances[_enemy_entity->get_id()].get()
+            });*/
         _game->get_component_manager()->add_component(*_enemy_entity, RigidBody2DComponent{
             .velocity = { _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY,
                         _rands.get_uniform_real("enemy_velocity") * VELOCITY_ENEMY }
@@ -163,12 +170,7 @@ namespace Galaga
 
     }
 
-    void EnemySpawner::shoot()
-    {
-	    
-    }
-
-    void EnemySpawner::update(Mage::ComponentManager& componentManager, float delta_time)
+    void EnemySpawner::shoot(float delta_time)
     {
         Mage::EntityList enemy_list = _game->get_entity_manager()->get_all_entities_by_type(Galaga::EntityType::Enemy);
         for (auto e : enemy_list)
@@ -181,19 +183,20 @@ namespace Galaga
             ec->first_throw_delay -= delta_time;
 
             if (ec->last_bullet >= MIN_TIME_BETWEEN_BULLET
-                && _rands.get_uniform_real("bullet_probability") < BULLET_PROBABILITY 
+                && _rands.get_uniform_real("bullet_probability") < BULLET_PROBABILITY
                 && ec->first_throw_delay <= 0.0f)
             {
                 ec->last_bullet = 0.0f;
 
                 //This is the spawn bullet logic
+                auto s = _enemy_sprites["snowball"].get();
                 auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
                 auto eb = _game->get_entity_manager()->add_entity(Galaga::EntityType::Bullet);
-                //_game->get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = _player_sprites["bullet"].get() });
-                _game->get_component_manager()->add_component<ColorComponent>(*eb,
+                _game->get_component_manager()->add_component<SpriteComponent>(*eb, { .sprite = s });
+                /*_game->get_component_manager()->add_component<ColorComponent>(*eb,
                     {
                        .color = Mage::Color::custom(0.7f, 0.7f, 0.0f, 0.7f)
-                    });
+                    });*/
                 _game->get_component_manager()->add_component<RigidBody2DComponent>(*eb,
                     {
                         //use _rands to change x for angles
@@ -220,6 +223,11 @@ namespace Galaga
                     });
             }
         }
+    }
+
+    void EnemySpawner::update(Mage::ComponentManager& componentManager, float delta_time)
+    {
+        shoot(delta_time);
     }
 
     void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
