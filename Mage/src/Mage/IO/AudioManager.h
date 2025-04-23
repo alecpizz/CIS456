@@ -21,7 +21,8 @@ namespace Mage
 
         bool load_sound(const char *key, const char *mixer_group, const char *sound_file);
 
-        bool play_sound(const char *key, bool loop = false);
+        bool play_sound(const char *key, bool loop = false,
+            void(*on_end_callback)(void* user_data) = nullptr, void* callback_data = nullptr);
 
         bool stop_sound(const char *key);
 

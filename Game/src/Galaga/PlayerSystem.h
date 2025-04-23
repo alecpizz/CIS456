@@ -62,8 +62,8 @@ namespace Galaga
 
         //void update_camera(const RigidBody2DComponent* r, const SpriteComponent* s, const Transform2DComponent* t, float dt);
 
-        //void update_player_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
-        //    BoundingBoxComponent* b);
+        void update_player_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
+            BoundingBoxComponent* b);
 
         void kill_enemy(Mage::Entity* bullet, Mage::Entity* other);
     };
