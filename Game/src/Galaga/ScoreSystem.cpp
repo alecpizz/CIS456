@@ -11,10 +11,12 @@ namespace Galaga {
 	void ScoreSystem::update(Mage::ComponentManager& component_manager, float delta_time)
 	{
 		
-		auto score = component_manager.get_component<ScoreComponent>(*_player_entity);
-		std::string txt = "Score: " + std::to_string(score->current);
-		_game->get_text_renderer()->render_text(*_font, txt.c_str(),
+		_game->get_text_renderer()->render_text(*_font, "SCORE",
 			10.0f, static_cast<float>(_font->get_line_height()) - 5.0f,
+			0.5f, Mage::Color::red);
+		auto score = component_manager.get_component<ScoreComponent>(*_player_entity);
+		_game->get_text_renderer()->render_text(*_font, std::to_string(score->current).c_str(),
+			10.0f, static_cast<float>(_font->get_line_height()) + 15.0f,
 			0.5f, Mage::Color::white);
 	}
 

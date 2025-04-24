@@ -16,7 +16,8 @@ add_executable(
  "src/Galaga/ShapeRenderingSystem.h" "src/Galaga/MovementSystem.h" 
  "src/Galaga/LifetimeSystem.h" 
  "src/Galaga/EnemySpawner.h" "src/Galaga/EnemySpawner.cpp"
- "src/Galaga/CollisionSystem.cpp" "src/Galaga/CollisionSystem.h"
+ "src/Galaga/CollisionSystem.cpp"
+ "src/Galaga/CollisionSystem.h"
  "src/Galaga/RandomWrapper.h"
  "src/Galaga/SpriteRenderingSystem.h"
  "src/Galaga/ScoreSystem.cpp")
