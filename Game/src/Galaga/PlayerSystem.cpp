@@ -2,11 +2,11 @@
 #include "Galaga.h"
 
 #define VELOCITY_PLAYER 500.0f
-#define SCALE_PLAYER 0.25f
+#define SCALE_PLAYER 0.25f //.25 //.5
 #define BBOX_CENTER_X_PLAYER 20.0f
 #define BBOX_CENTER_Y_PLAYER 20.0f
-#define BBOX_HALF_WIDTH_PLAYER 20.0f
-#define BBOX_HALF_HEIGHT_PLAYER 20.0f
+#define BBOX_HALF_WIDTH_PLAYER 117.5f//20.0f
+#define BBOX_HALF_HEIGHT_PLAYER 117.5f//20.0f
 #define VELOCITY_BULLET 1000.0f
 #define SCALE_BULLET 0.5f
 #define LIFETIME_BULLET 3.0f
@@ -223,6 +223,8 @@ namespace Galaga
 
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
+            //_player_entity->destroy();
+            //LOG_INFO("You died!");
             return;
         }
     }
