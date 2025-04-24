@@ -131,8 +131,8 @@ namespace Galaga
         	(_game->get_window()->get_width() - 20.0f * 0.25f) / 2.0f,
         	20.0f
         };
-        auto player_half_x = static_cast<float>(sprite->get_width()) * 0.5f * SCALE_PLAYER;
-        auto player_half_y = static_cast<float>(sprite->get_height()) * 0.5f * SCALE_PLAYER;
+        auto player_half_x = static_cast<float>(sprite->get_width()) * SCALE_PLAYER;
+        auto player_half_y = static_cast<float>(sprite->get_height()) * SCALE_PLAYER;
         b->center = { player_half_x, player_half_y };
         b->half_size = { player_half_x, player_half_y };
         r->velocity = glm::vec2(0.0f, 0.0f);
