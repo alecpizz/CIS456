@@ -10,6 +10,7 @@
 #define VELOCITY_BULLET 1000.0f
 #define SCALE_BULLET 0.5f
 #define LIFETIME_BULLET 3.0f
+#define DURATION_SHOOTING 0.1
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_player_entity)
 
@@ -98,6 +99,9 @@ namespace Galaga
                     spawn();
                 }
             });
+		_game->get_component_manager()->add_component(*_player_entity, ScoreComponent{
+				.current = 0,
+			});
     }
 
     void PlayerSystem::reset_player_entity()
@@ -129,7 +133,7 @@ namespace Galaga
         {
             r->velocity.x += -1.0f;
         }
-        if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - s->sprite->get_width() * SCALE_PLAYER)
+		if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - s->sprite->get_width() * SCALE_PLAYER)
         {
             r->velocity.x += 1.0f;
         }
@@ -153,6 +157,10 @@ namespace Galaga
         bullet->destroy();
         other->destroy();
         //TODO: kill count
+
+        auto score = GPEC(ScoreComponent);
+        score->current += 100;
+		LOG_INFO("Score: %d", score->current);
     }
 
     void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
@@ -166,9 +174,7 @@ namespace Galaga
         LOG_INFO("%d", _wasd_states);
 
         if (key == Mage::Key::Return)
-        {
-            shoot();
-        }
+            _shooting = true;
     }
 
     void PlayerSystem::on_key_up(Mage::Key key, uint16_t key_modifiers)
@@ -177,6 +183,9 @@ namespace Galaga
         _wasd_states &= (key == Mage::Key::A) ? ~0x02 : 0xFF;
         _wasd_states &= (key == Mage::Key::S) ? ~0x04 : 0xFF;
         _wasd_states &= (key == Mage::Key::D) ? ~0x08 : 0xFF;
+
+        if (key == Mage::Key::Return)
+            _shooting = false;
     }
 
     void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value) {}
@@ -201,6 +210,10 @@ namespace Galaga
         auto t = GPEC(Transform2DComponent);
         auto b = GPEC(BoundingBoxComponent);
 
+        _last_shot += delta_time;
+        if (_shooting && _last_shot > DURATION_SHOOTING)
+            shoot();
+
         update_player_velocity(r, t, delta_time);
         update_player_sprite(r, s, t, b);
     }
@@ -220,4 +233,9 @@ namespace Galaga
             return;
         }
     }
+
+	Mage::Entity* PlayerSystem::get_player_entity() const
+	{
+		return _player_entity;
+	}
 }
