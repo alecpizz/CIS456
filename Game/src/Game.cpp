@@ -59,10 +59,13 @@ Game::Game() : Application("Game", 1024, 768, 0), _rands()
     get_audio_manager()->set_mixer_group_volume("music", 0.25f);
     get_audio_manager()->set_mixer_group_volume("effects", 0.25f);
     get_audio_manager()->load_sound("music_1", "music", "res/sounds/bg_music_1.mp3");
+    get_audio_manager()->load_sound("music_2", "music", "res/sounds/bg_music_2.mp3");
+    get_audio_manager()->load_sound("music_3", "music", "res/sounds/bg_music_3.mp3");
+    get_audio_manager()->load_sound("music_4", "music", "res/sounds/bg_music_4.mp3");
     get_audio_manager()->load_sound("gunshot", "effects", "res/sounds/gunshot.wav");
     get_audio_manager()->load_sound("enemy_death", "effects", "res/sounds/enemy_death.mp3");
     get_audio_manager()->load_sound("death", "effects", "res/sounds/death.wav");
-    get_audio_manager()->play_sound("music_1", true);
+    bg_music_cycle(this);
     _rands.add_uniform_real_distribution("rotation", -90.0f, 90.0f);
     _rands.add_uniform_real_distribution("scale_x", 10.0f, 50.0f);
     _rands.add_uniform_real_distribution("scale_y", 1.0f, 10.0f);
@@ -132,6 +135,28 @@ Game::Game() : Application("Game", 1024, 768, 0), _rands()
 RandomWrapper *Game::get_rands()
 {
     return &_rands;
+}
+
+void Game::bg_music_cycle(void *game)
+{
+    auto gm = static_cast<Game*>(game);
+    if (gm->_current_bg_music == 1)
+    {
+        gm->get_audio_manager()->play_sound("music_2", false, Game::bg_music_cycle, game);
+    }
+    else if (gm->_current_bg_music == 2)
+    {
+        gm->get_audio_manager()->play_sound("music_3", false, Game::bg_music_cycle, game);
+    }
+    else if (gm->_current_bg_music == 3)
+    {
+        gm->get_audio_manager()->play_sound("music_4", false, Game::bg_music_cycle, game);
+    }
+    else
+    {
+        gm->get_audio_manager()->play_sound("music_1", false, Game::bg_music_cycle, game);
+    }
+    gm->_current_bg_music = (gm->_current_bg_music + 1) % 4;
 }
 
 void Game::on_app_closing()

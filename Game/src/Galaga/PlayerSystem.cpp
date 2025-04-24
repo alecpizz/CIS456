@@ -99,6 +99,9 @@ namespace Galaga
                     spawn();
                 }
             });
+		_game->get_component_manager()->add_component(*_player_entity, ScoreComponent{
+				.current = 0,
+			});
     }
 
     void PlayerSystem::reset_player_entity()
@@ -154,6 +157,10 @@ namespace Galaga
         bullet->destroy();
         other->destroy();
         //TODO: kill count
+
+        auto score = GPEC(ScoreComponent);
+        score->current += 100;
+		LOG_INFO("Score: %d", score->current);
     }
 
     void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
@@ -228,4 +235,9 @@ namespace Galaga
             return;
         }
     }
+
+	Mage::Entity* PlayerSystem::get_player_entity() const
+	{
+		return _player_entity;
+	}
 }
