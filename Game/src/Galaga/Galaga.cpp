@@ -30,6 +30,7 @@ namespace Galaga
         get_component_manager()->register_component<BoundingBoxComponent>();
         get_component_manager()->register_component<LifetimeComponent>();
         get_component_manager()->register_component<DestructionNotificationComponent>();
+        get_component_manager()->register_component<ScoreComponent>();
 
         _shape_rendering_system = std::make_unique<ShapeRenderingSystem>(*get_shape_renderer());
         _movement_system = std::make_unique<MovementSystem>();
@@ -39,6 +40,7 @@ namespace Galaga
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
         _background_sprite = std::make_unique<Mage::Sprite>("res/sprites/bg.png", 1, 0.0f);
+		_score_system = std::make_unique<ScoreSystem>(this);
 
         get_system_manager()->register_system<SpriteComponent, Transform2DComponent>(*_sprite_rendering_system);
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
@@ -49,6 +51,7 @@ namespace Galaga
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_spawning_system);
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
         get_system_manager()->register_system<BoundingBoxComponent, Transform2DComponent>(*_collision_system);
+		get_system_manager()->register_system<ScoreComponent>(*_score_system);
 
 
         auto bg_entity = get_entity_manager()->add_entity(EntityType::Background);
@@ -72,6 +75,7 @@ namespace Galaga
         get_audio_manager()->load_sound("enemy_death", "effects", "res/sounds/short_yell.mp3");
         get_audio_manager()->load_sound("game_music", "music", "res/sounds/synth.mp3");
         get_audio_manager()->play_sound("game_music");
+		_score_system->set_player_entity(_player_system->get_player_entity());
 
         // basic wall for testing --> The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);

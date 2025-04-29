@@ -17,8 +17,7 @@ add_executable(
  "src/Galaga/LifetimeSystem.h" 
  "src/Galaga/EnemySpawner.h" "src/Galaga/EnemySpawner.cpp"
  "src/Galaga/CollisionSystem.cpp" "src/Galaga/CollisionSystem.h" 
- "src/Galaga/RandomWrapper.h"
- "src/Galaga/SpriteRenderingSystem.h")
+ "src/Galaga/RandomWrapper.h" "src/Galaga/ScoreSystem.cpp" "src/Galaga/SpriteRenderingSystem.h")
 
 set_property( TARGET "Game" PROPERTY LINKER_LANGUAGE CXX )
 set_property( TARGET "Game" PROPERTY CXX_STANDARD 20)
