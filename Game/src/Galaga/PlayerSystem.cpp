@@ -152,12 +152,11 @@ namespace Galaga
 	        return;
         }
 
-        auto sw = _player_sprites["player_idle"].get()->get_width();
-        if (_wasd_states & 0x02 && t->translation.x > 0.0f)
+        if (_wasd_states & 0x02)
         {
             r->velocity.x += -1.0f;
         }
-		if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - sw * SCALE_PLAYER)
+		if (_wasd_states & 0x08)
         {
             r->velocity.x += 1.0f;
         }
@@ -172,6 +171,13 @@ namespace Galaga
         {
             r->velocity.x = 1.0f;
         }
+
+        // Out of bounds
+        auto sw = _player_sprites["player_idle"].get()->get_width();
+        if (r->velocity.x < 0 && t->translation.x < 0.0f)
+            r->velocity.x = 0.0f;
+        else if (r->velocity.x > 0 && t->translation.x > _game->get_window()->get_width() - sw * SCALE_PLAYER)
+            r->velocity.x = 0.0f;
 
         r->velocity.x *= VELOCITY_PLAYER;
     }
