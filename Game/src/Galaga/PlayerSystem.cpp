@@ -59,7 +59,7 @@ namespace Galaga
 
     void PlayerSystem::shoot()
     {
-        _shooting = true;
+        if (_is_down) return;
         _last_shot = 0.0f;
         auto t = GPEC(Transform2DComponent);
         auto b = GPEC(BoundingBoxComponent);
@@ -145,8 +145,14 @@ namespace Galaga
             return;
         }
 
-        auto sw = _player_sprites["player_idle"].get()->get_width();
         r->velocity.x = 0.0f;
+
+        if (_is_down)
+        {
+	        return;
+        }
+
+        auto sw = _player_sprites["player_idle"].get()->get_width();
         if (_wasd_states & 0x02 && t->translation.x > 0.0f)
         {
             r->velocity.x += -1.0f;
@@ -154,6 +160,17 @@ namespace Galaga
 		if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - sw * SCALE_PLAYER)
         {
             r->velocity.x += 1.0f;
+        }
+
+        r->velocity.x += _controller_player_movement_x_axis;
+
+        if (-1.0f > r->velocity.x)
+        {
+            r->velocity.x = -1.0f;
+        }
+        else if (r->velocity.x > 1.0f)
+        {
+            r->velocity.x = 1.0f;
         }
 
         r->velocity.x *= VELOCITY_PLAYER;
@@ -212,7 +229,28 @@ namespace Galaga
             _shooting = false;
     }
 
-    void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value) {}
+    void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value)
+    {
+        if (_is_down) return;
+
+        // Move (left joystick)
+    	if (controller_id == 0 && axis_id == 0)
+        {
+            if (-1.05f > axis_value || axis_value > -0.95f)
+                _controller_player_movement_x_axis = axis_value + 1.0f;
+            else
+                _controller_player_movement_x_axis = 0.0f;
+        }
+
+        // Shoot (right trigger)
+        if (controller_id == 0 && axis_id == 5)
+        {
+            if (axis_value > -0.05f)
+                _shooting = true;
+            else
+                _shooting = false;
+        }
+    }
     void PlayerSystem::on_controller_button_down(uint32_t controller_id, uint8_t button_id) {}
     void PlayerSystem::on_controller_button_up(uint32_t controller_id, uint8_t button_id) {}
     void PlayerSystem::on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count)

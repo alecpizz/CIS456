@@ -132,7 +132,7 @@ namespace Galaga
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
-            LOG_INFO("Enemy hit!");
+            //LOG_INFO("Enemy hit!");
             return;
         }
 
