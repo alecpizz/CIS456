@@ -34,7 +34,7 @@ namespace Galaga
         //create sprite
         _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
         _enemy_sprites["penguin"] = std::make_shared<Mage::Sprite>("res/sprites/penguin.png", 1, 0.0f);
-        _enemy_sprites["penguinWalk"] = std::make_shared<Mage::Sprite>("res/sprites/penguinWalk.png", 2, 0.5f);
+        _enemy_sprites["penguinWalk"] = std::make_shared<Mage::Sprite>("res/sprites/penguinWalk.png", 2, 1.5f);
         _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 4, 0.30f);
         _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
         spawn();
@@ -59,9 +59,9 @@ namespace Galaga
             height++;
         }
         float buffer_x = 1.0f;
-        float buffer_y = 1.0f;
-        float enemy_width = 100;
-        float enemy_height = 100;
+        float buffer_y = 0.5f;
+        float enemy_width = 128;
+        float enemy_height = 80;
         glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() - _game->get_window()->get_height() / 4);
         float x_first = origin.x - (width * enemy_width / 2) - ((width - 1) * buffer_x / 2);
         float y_first = origin.y - (height * enemy_height / 2) - ((height - 1) * buffer_y / 2);
@@ -73,7 +73,7 @@ namespace Galaga
             uint32_t x = i % width;
             uint32_t y = i / width;
             float xPos = x_first + (x * (enemy_width * buffer_x));
-            float yPos = y_first + (y * (enemy_height * buffer_y));
+            float yPos = y_first + (y * (enemy_height * buffer_y)) + 100;
             glm::vec2 pos = glm::vec2(xPos, yPos);
 
             create_enemy_entity(pos);
@@ -84,7 +84,7 @@ namespace Galaga
     void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
-        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguin"].get());
+        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinWalk"].get());
         auto sprite = _enemy_instances[_enemy_entity->get_id()].get();
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent
             {
@@ -110,9 +110,9 @@ namespace Galaga
             {
                 collision_detected(enemy, other, overlap);
             } });
-        /*_game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
+        _game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
                .color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f)
-            });*/
+            });
         _game->get_component_manager()->add_component(*_enemy_entity, DestructionNotificationComponent
             {
                 .on_destroyed = [&]()
@@ -128,7 +128,7 @@ namespace Galaga
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet)
         {
-            LOG_INFO("Enemy hit!");
+            //LOG_INFO("Enemy hit!");
             return;
         }
 
