@@ -39,21 +39,42 @@ namespace Galaga
         _sprite_rendering_system = std::make_unique<SpriteRenderingSystem>(*get_sprite_renderer());
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
+        _background_sprite = std::make_unique<Mage::Sprite>("res/sprites/bg.png", 1, 0.0f);
 		_score_system = std::make_unique<ScoreSystem>(this);
 
+        get_system_manager()->register_system<SpriteComponent, Transform2DComponent>(*_sprite_rendering_system);
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);
         get_system_manager()->register_system<PlayerComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_player_system);
-        get_system_manager()->register_system<SpriteComponent, Transform2DComponent>(*_sprite_rendering_system);
         get_system_manager()->register_system<EnemyComponent,
             SpriteComponent, Transform2DComponent, RigidBody2DComponent>(*_enemy_spawning_system);
         get_system_manager()->register_system<LifetimeComponent>(*_lifetime_system);
         get_system_manager()->register_system<BoundingBoxComponent, Transform2DComponent>(*_collision_system);
 		get_system_manager()->register_system<ScoreComponent>(*_score_system);
 
+
+        auto bg_entity = get_entity_manager()->add_entity(EntityType::Background);
+        get_component_manager()->add_component<SpriteComponent>(*bg_entity, {_background_sprite.get()});
+        auto bg_scale = glm::vec2(static_cast<float>(get_window()->get_width()) /_background_sprite->get_width(),
+            static_cast<float>(get_window()->get_height()) /_background_sprite->get_height());
+        // auto bg_pos = glm::vec2(get_window()->get_width() * 0.5f,
+            // get_window()->get_height() * 0.5f );
+        auto bg_pos = glm::vec2(0.0f);
+        get_component_manager()->add_component<Transform2DComponent>(*bg_entity, Transform2DComponent(bg_pos, bg_scale));
+
         _player_system->initialize();
         _enemy_spawning_system->initialize();
+
+        get_audio_manager()->set_mixer_group_volume("music", 0.05f);
+        get_audio_manager()->set_mixer_group_volume("effects", 1.0f);
+        get_audio_manager()->load_sound("player_shoot", "effects", "res/sounds/whoosh.mp3");
+        get_audio_manager()->load_sound("enemy_shoot", "effects", "res/sounds/whoosh.mp3");
+        // get_audio_manager()->load_sound("player_death", "effects", "res/sounds/player_shoot.mp3");
+        get_audio_manager()->load_sound("enemy_collide", "effects", "res/sounds/wet_slap.mp3");
+        get_audio_manager()->load_sound("enemy_death", "effects", "res/sounds/short_yell.mp3");
+        get_audio_manager()->load_sound("game_music", "music", "res/sounds/synth.mp3");
+        get_audio_manager()->play_sound("game_music");
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
         // basic wall for testing --> The Bottom
@@ -135,6 +156,8 @@ namespace Galaga
                                                                    .color =
                                                                    Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
             });
+
+
     }
 
 

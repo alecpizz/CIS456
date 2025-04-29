@@ -2,6 +2,7 @@
 #include "../Renderer/Camera.h"
 #include "../Renderer/TextRenderer.h"
 #include "../Renderer/SpriteRenderer.h"
+#include "../Renderer/SnowRenderer.h"
 #include "../Renderer/ShapeRenderer.h"
 #include "../Scene/EntityManager.h"
 #include "../Scene/ComponentManager.h"
@@ -37,7 +38,9 @@ namespace Mage
         std::unique_ptr<ShapeRenderer> shape_renderer;
         std::unique_ptr<Camera> camera;
         std::unique_ptr<AudioManager> audio_manager;
+        std::unique_ptr<SnowRenderer> snow_renderer;
         bool closing = false;
+        float time_since_start = 0.0f;
 
         void construct(const char *title, bool full_screen = true,
                        uint32_t w = 0, uint32_t h = 0, uint8_t swap_interval = 0)
@@ -57,6 +60,7 @@ namespace Mage
             sprite_renderer = std::unique_ptr<SpriteRenderer>(new SpriteRenderer(*camera));
             text_renderer = std::unique_ptr<TextRenderer>(new TextRenderer(*window));
             audio_manager = std::unique_ptr<AudioManager>(new AudioManager());
+            snow_renderer = std::unique_ptr<SnowRenderer>(new SnowRenderer());
             component_manager->set_system_manager(*system_manager);
             entity_manager->set_system_manager(*system_manager);
             system_manager->set_component_manager(*component_manager);
@@ -139,6 +143,11 @@ namespace Mage
         return _impl->camera.get();
     }
 
+    SnowRenderer * Application::get_snow_renderer() const
+    {
+        return _impl->snow_renderer.get();
+    }
+
     void Application::close()
     {
         LOG_E_INFO("Application::closed called");
@@ -152,6 +161,7 @@ namespace Mage
 
         while (!_impl->closing)
         {
+            _impl->time_since_start += et.elapsed;
             _impl->entity_manager->update();
 
             _impl->event_manager->poll_events();
@@ -160,6 +170,8 @@ namespace Mage
             {
                 s->update(*_impl->component_manager, et.elapsed);
             }
+            _impl->snow_renderer->render_snow(_impl->time_since_start,
+                glm::vec2(_impl->window->get_width(), _impl->window->get_height()));
             _impl->window->present();
             et.update();
         }
