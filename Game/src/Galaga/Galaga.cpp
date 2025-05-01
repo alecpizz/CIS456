@@ -59,7 +59,7 @@ namespace Galaga
         _enemy_spawning_system->initialize();
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
-        // basic wall for testing --> The Bottom
+        //The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);
         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
                                                                          .center = glm::vec2(0.5f, 0.5f),
