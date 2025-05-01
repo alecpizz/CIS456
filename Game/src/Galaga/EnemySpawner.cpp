@@ -210,8 +210,8 @@ namespace Galaga
                     {
                         .remaining = LIFETIME_BULLET
                     });
-                auto bullet_half_x = 0.5f;
-                auto bullet_half_y = 0.5f;
+                auto bullet_half_x = static_cast<float>(s->get_width()) * SCALE_BULLET;
+                auto bullet_half_y = static_cast<float>(s->get_height()) * SCALE_BULLET;
                 _game->get_component_manager()->add_component<BoundingBoxComponent>(*eb, {
                     .center = {bullet_half_x, bullet_half_y},
                     .half_size = {bullet_half_x, bullet_half_y},

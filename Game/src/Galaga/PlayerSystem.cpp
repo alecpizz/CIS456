@@ -2,11 +2,11 @@
 #include "Galaga.h"
 
 #define VELOCITY_PLAYER 500.0f
-#define SCALE_PLAYER 0.25f //.25 //.5
+#define SCALE_PLAYER 0.25f
 #define BBOX_CENTER_X_PLAYER 20.0f
 #define BBOX_CENTER_Y_PLAYER 20.0f
-#define BBOX_HALF_WIDTH_PLAYER 117.5f//20.0f
-#define BBOX_HALF_HEIGHT_PLAYER 117.5f//20.0f
+#define BBOX_HALF_WIDTH_PLAYER 20.0f
+#define BBOX_HALF_HEIGHT_PLAYER 20.0f
 #define VELOCITY_BULLET 1000.0f
 #define SCALE_BULLET 0.5f
 #define LIFETIME_BULLET 3.0f
@@ -34,19 +34,32 @@ namespace Galaga
         _player_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
         _player_sprites["player_idle"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanPlayer.png", 1, 0.0f);
         _player_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
+        _player_sprites["explosion"] = std::make_shared<Mage::Sprite>("res/sprites/explosion.png", 17, 0.08f);
 
         spawn();
     }
 
     void PlayerSystem::spawn()
     {
+        LOG_INFO("SPAWN");
         create_player_entity();
         reset_player_entity();
     }
 
+    void PlayerSystem::death()
+    {
+        _is_down = true;
+        _time_down = 0.0f;
+        auto score = GPEC(ScoreComponent);
+        if (score->current > 200)
+            score->current -= 200;
+        else
+            score->current = 0;
+    }
+
     void PlayerSystem::shoot()
     {
-        _shooting = true;
+        if (_is_down) return;
         _last_shot = 0.0f;
         auto t = GPEC(Transform2DComponent);
         auto b = GPEC(BoundingBoxComponent);
@@ -118,8 +131,8 @@ namespace Galaga
         	(_game->get_window()->get_width() - 20.0f * 0.25f) / 2.0f,
         	20.0f
         };
-        auto player_half_x = static_cast<float>(sprite->get_width()) * 0.5f * SCALE_PLAYER;
-        auto player_half_y = static_cast<float>(sprite->get_height()) * 0.5f * SCALE_PLAYER;
+        auto player_half_x = static_cast<float>(sprite->get_width()) * SCALE_PLAYER;
+        auto player_half_y = static_cast<float>(sprite->get_height()) * SCALE_PLAYER;
         b->center = { player_half_x, player_half_y };
         b->half_size = { player_half_x, player_half_y };
         r->velocity = glm::vec2(0.0f, 0.0f);
@@ -127,16 +140,44 @@ namespace Galaga
 
     void PlayerSystem::update_player_velocity(RigidBody2DComponent* r, Transform2DComponent* t, float delta_time)
     {
-        auto s = GPEC(SpriteComponent);
+        if (_player_entity->is_destroyed())
+        {
+            return;
+        }
+
         r->velocity.x = 0.0f;
-        if (_wasd_states & 0x02 && t->translation.x > 0.0f)
+
+        if (_is_down)
+        {
+	        return;
+        }
+
+        if (_wasd_states & 0x02)
         {
             r->velocity.x += -1.0f;
         }
-		if (_wasd_states & 0x08 && t->translation.x < _game->get_window()->get_width() - s->sprite->get_width() * SCALE_PLAYER)
+		if (_wasd_states & 0x08)
         {
             r->velocity.x += 1.0f;
         }
+
+        r->velocity.x += _controller_player_movement_x_axis;
+
+        if (-1.0f > r->velocity.x)
+        {
+            r->velocity.x = -1.0f;
+        }
+        else if (r->velocity.x > 1.0f)
+        {
+            r->velocity.x = 1.0f;
+        }
+
+        // Out of bounds
+        auto sw = _player_sprites["player_idle"].get()->get_width();
+        if (r->velocity.x < 0 && t->translation.x < 0.0f)
+            r->velocity.x = 0.0f;
+        else if (r->velocity.x > 0 && t->translation.x > _game->get_window()->get_width() - sw * SCALE_PLAYER)
+            r->velocity.x = 0.0f;
 
         r->velocity.x *= VELOCITY_PLAYER;
     }
@@ -144,7 +185,14 @@ namespace Galaga
     void PlayerSystem::update_player_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
         BoundingBoxComponent* b)
     {
-    	//sprite->sprite = _player_sprites["player_idle"].get();
+        if (_is_down)
+        {
+            sprite->sprite = _player_sprites["explosion"].get();
+        }
+        else
+        {
+            sprite->sprite = _player_sprites["player_idle"].get();
+        }
     }
 
     void PlayerSystem::kill_enemy(Mage::Entity* bullet, Mage::Entity* other)
@@ -156,16 +204,15 @@ namespace Galaga
 
         bullet->destroy();
         other->destroy();
-        //TODO: kill count
 
-        auto score = GPEC(ScoreComponent);
+    	auto score = GPEC(ScoreComponent);
         score->current += 100;
 		LOG_INFO("Score: %d", score->current);
     }
 
     void PlayerSystem::on_key_down(Mage::Key key, uint16_t key_modifiers, uint8_t repeat_count)
     {
-        if (repeat_count > 0) return;
+        if (repeat_count > 0 || _is_down) return;
         LOG_INFO("Key down: %d", key);
         _wasd_states |= (key == Mage::Key::W) ? 0x01 : 0;
         _wasd_states |= (key == Mage::Key::A) ? 0x02 : 0;
@@ -188,7 +235,28 @@ namespace Galaga
             _shooting = false;
     }
 
-    void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value) {}
+    void PlayerSystem::on_controller_axis_motion(uint32_t controller_id, uint8_t axis_id, float axis_value)
+    {
+        if (_is_down) return;
+
+        // Move (left joystick)
+    	if (controller_id == 0 && axis_id == 0)
+        {
+            if (-1.05f > axis_value || axis_value > -0.95f)
+                _controller_player_movement_x_axis = axis_value + 1.0f;
+            else
+                _controller_player_movement_x_axis = 0.0f;
+        }
+
+        // Shoot (right trigger)
+        if (controller_id == 0 && axis_id == 5)
+        {
+            if (axis_value > -0.05f)
+                _shooting = true;
+            else
+                _shooting = false;
+        }
+    }
     void PlayerSystem::on_controller_button_down(uint32_t controller_id, uint8_t button_id) {}
     void PlayerSystem::on_controller_button_up(uint32_t controller_id, uint8_t button_id) {}
     void PlayerSystem::on_mouse_button_down(Mage::MouseButton button, float x, float y, uint8_t click_count)
@@ -214,24 +282,35 @@ namespace Galaga
         if (_shooting && _last_shot > DURATION_SHOOTING)
             shoot();
 
+        if (_is_down)
+        {
+            _time_down += delta_time;
+            if (_time_down > 2.0f)
+            {
+                _is_down = false;
+                _invincible = true;
+                _time_invincible = 0.0f;
+            }
+        }
+        else if (_invincible)
+        {
+            _time_invincible += delta_time;
+             if (_time_invincible > 1.0f)
+             {
+                 _invincible = false;
+             }
+        }
+
         update_player_velocity(r, t, delta_time);
         update_player_sprite(r, s, t, b);
     }
 
     void PlayerSystem::collision_detected(Mage::Entity* other_entity)
     {
-        if (other_entity->get_type() == Galaga::EntityType::Enemy)
+        if (other_entity->get_type() == Galaga::EntityType::Bullet && !_is_down && !_invincible)
         {
-            //other_entity->destroy();
-            //_player_entity->destroy();
-            LOG_INFO("You hit an enemy!");
-            return;
-        }
-
-        if (other_entity->get_type() == Galaga::EntityType::Bullet)
-        {
-            //_player_entity->destroy();
-            //LOG_INFO("You died!");
+            other_entity->destroy();
+            death();
             return;
         }
     }
