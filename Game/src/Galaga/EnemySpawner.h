@@ -33,6 +33,7 @@ namespace Galaga
         RandomWrapper _rands;
 
         void shoot(float delta_time);
+        void update_enemy_sprites(Mage::Entity* e);
         void update_enemy_sprites();
         void create_enemy_entity(glm::vec2 pos);
         void spawn();
