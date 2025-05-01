@@ -56,6 +56,11 @@ namespace Galaga
         _enemy_spawning_system->initialize();
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
+
+
+        //_game_sprites["iceBlock"] = std::make_shared<Mage::Sprite>("res/sprites/iceBlock.png", 1, 0.0f);
+        //auto sprite = _game_sprites["iceBlock"].get();
+
         //The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);
         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
@@ -67,7 +72,7 @@ namespace Galaga
                                                                    .color =
                                                                    Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
             });
-
+        //get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
 
         
         // Fortnite Boxing
