@@ -22,6 +22,8 @@ namespace Mage
 
     class ShapeRenderer;
 
+    class SnowRenderer;
+
     class AudioManager;
 
     class MAGE_API Application
@@ -59,6 +61,8 @@ namespace Mage
 
         AudioManager *get_audio_manager() const;
         Camera *get_camera() const;
+
+        SnowRenderer *get_snow_renderer() const;
 
         void close();
 

@@ -39,6 +39,8 @@ namespace Galaga
 
         void collision_detected(Mage::Entity* other_entity);
 
+        Mage::Entity* get_player_entity() const;
+
     private:
         Galaga* _game;
         Mage::Entity* _player_entity;
@@ -60,8 +62,8 @@ namespace Galaga
 
         //void update_camera(const RigidBody2DComponent* r, const SpriteComponent* s, const Transform2DComponent* t, float dt);
 
-        //void update_player_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
-        //    BoundingBoxComponent* b);
+        void update_player_sprite(const RigidBody2DComponent* r, SpriteComponent* sprite, Transform2DComponent* t,
+            BoundingBoxComponent* b);
 
         void kill_enemy(Mage::Entity* bullet, Mage::Entity* other);
     };

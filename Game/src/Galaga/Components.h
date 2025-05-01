@@ -46,6 +46,8 @@ namespace Galaga
 
     struct EnemyComponent
     {
+        float last_bullet = 3.0f;
+        float first_throw_delay = 0.0f;
     };
 
     struct BoundingBoxComponent
@@ -65,4 +67,9 @@ namespace Galaga
     {
         std::function<void()> on_destroyed = nullptr;
     };
+
+	struct ScoreComponent
+	{
+		uint32_t current = 0;
+	};
 }
