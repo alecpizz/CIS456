@@ -5,23 +5,29 @@
 
 #include "Galaga.h"
 
-#define DURATION_THROWING       0.60f
-#define VELOCITY_ENEMY          50.0f
-#define SCALE_ENEMY             0.5f
-#define BULLET_PROBABILITY      0.01f
-#define MAX_FIRST_THROW_DELAY   2.0f
+#define VELOCITY_ENEMY 50.0f
+#define SCALE_ENEMY 0.15f
+#define OFFSET_ENEMY_CENTER 24.0f
+#define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
+#define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
+#define BBOX_CENTER_Y_ENEMY 20.0f
+#define BBOX_HALF_WIDTH_ENEMY 20.0f
+#define BBOX_HALF_HEIGHT_ENEMY 20.0f
+#define BULLET_PROBABILITY 0.01f
+#define MAX_FIRST_THROW_DELAY 2.0f
 #define MIN_TIME_BETWEEN_BULLET 3.0f
-#define VELOCITY_BULLET         400.0f
-#define SCALE_BULLET            0.5f
-#define LIFETIME_BULLET         5.0f
-#define BULLET_X_VELOCITY       150.0f
-#define ROWS                    3
-#define COLS                    5
+#define VELOCITY_BULLET 400.0f
+#define SCALE_BULLET 0.5f
+#define LIFETIME_BULLET 5.0f
+#define BULLET_X_VELOCITY 150.0f
+#define ROWS 3
+#define COLS 5
 
+#define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
 
 namespace Galaga
 {
-    EnemySpawner::EnemySpawner(Galaga* galaga) : _game(galaga), _rows(ROWS), _cols(COLS)
+    EnemySpawner::EnemySpawner(Galaga *galaga) : _game(galaga), _rows(ROWS), _cols(COLS)
     {
         _rands.add_uniform_real_distribution("enemy_velocity", -1.0f, 2.0f);
         _rands.add_uniform_real_distribution("bullet_probability", 0.0f, 1.0f);
@@ -33,8 +39,7 @@ namespace Galaga
     {
         //create sprite
         _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
-        _enemy_sprites["penguinWalk"] = std::make_shared<Mage::Sprite>("res/sprites/penguinWalk.png", 2, .30f);
-        _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 4, 0.15f);
+        _enemy_sprites["penguin"] = std::make_shared<Mage::Sprite>("res/sprites/penguin.png", 1, 0.0f);
         _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
         spawn();
     }
@@ -58,10 +63,10 @@ namespace Galaga
             height++;
         }
         float buffer_x = 1.0f;
-        float buffer_y = 0.5f;
-        float enemy_width = 128;
-        float enemy_height = 80;
-        glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() - _game->get_window()->get_height() / 4);
+        float buffer_y = 1.0f;
+        float enemy_width = 60;
+        float enemy_height = 60;
+        glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() - _game->get_window()->get_height()/4);
         float x_first = origin.x - (width * enemy_width / 2) - ((width - 1) * buffer_x / 2);
         float y_first = origin.y - (height * enemy_height / 2) - ((height - 1) * buffer_y / 2);
 
@@ -72,23 +77,23 @@ namespace Galaga
             uint32_t x = i % width;
             uint32_t y = i / width;
             float xPos = x_first + (x * (enemy_width * buffer_x));
-            float yPos = y_first + (y * (enemy_height * buffer_y)) + 100;
+            float yPos = y_first + (y * (enemy_height * buffer_y));
             glm::vec2 pos = glm::vec2(xPos, yPos);
 
             create_enemy_entity(pos);
-
+            
         }
     }
 
     void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
-        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinWalk"].get());
+        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguin"].get());
         auto sprite = _enemy_instances[_enemy_entity->get_id()].get();
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent
             {
                 .first_throw_delay = _rands.get_uniform_real("first_throw_delay")
-            });
+        });
         _game->get_component_manager()->add_component(*_enemy_entity, SpriteComponent{
             .sprite = sprite
             });
@@ -100,18 +105,18 @@ namespace Galaga
             .translation = pos,
             .scale = glm::vec2(SCALE_ENEMY, SCALE_ENEMY)
             });
-        auto enemy_half_x = static_cast<float>(sprite->get_width() * SCALE_ENEMY);
-        auto enemy_half_y = static_cast<float>(sprite->get_height() * SCALE_ENEMY);
+        auto enemy_half_x = static_cast<float>(sprite->get_width())  * SCALE_ENEMY;
+        auto enemy_half_y = static_cast<float>(sprite->get_height())  * SCALE_ENEMY;
         _game->get_component_manager()->add_component(*_enemy_entity, BoundingBoxComponent{
-            .center = { enemy_half_x, enemy_half_y},
-            .half_size = { enemy_half_x, enemy_half_y},
+            .center = { enemy_half_x, enemy_half_y },
+            .half_size = { enemy_half_x, enemy_half_y },
             .on_collided = [&](Mage::Entity* enemy, Mage::Entity* other, const glm::vec2 overlap)
             {
                 collision_detected(enemy, other, overlap);
             } });
-        _game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
+        /*_game->get_component_manager()->add_component(*_enemy_entity, ColorComponent{
                .color = Mage::Color::custom(0.7f, 0.2f, 0.2f, 0.7f)
-            });
+            });*/
         _game->get_component_manager()->add_component(*_enemy_entity, DestructionNotificationComponent
             {
                 .on_destroyed = [&]()
@@ -136,12 +141,13 @@ namespace Galaga
             //LOG_INFO("Enemy Hit Wall.");
             auto oe_bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*other_entity);
             auto oe_t = _game->get_component_manager()->get_component<Transform2DComponent>(*other_entity);
-
+            
+            //GPEC Cannot be used below otherwise collision will only apply to the last generated enemy
             auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*enemy);
             auto bb = _game->get_component_manager()->get_component<BoundingBoxComponent>(*enemy);
             auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*enemy);
             //auto c = _game->get_component_manager()->get_component<ColorComponent>(*enemy);
-
+            
             auto prev_overlap = CollisionSystem::calculate_overlap(t->prev_translation, t->scale,
                 oe_t->translation, oe_t->scale, bb, oe_bb);
 
@@ -152,7 +158,7 @@ namespace Galaga
             {
                 //c->color = Mage::Color::aquamarine;
                 t->translation.x = t->prev_translation.x;
-                r->velocity.x *= -1.0f;
+                r->velocity.x *= -1.0f ;
             }
             if (prev_overlap.x > 0.1f)
             {
@@ -174,21 +180,15 @@ namespace Galaga
             auto ec = _game->get_component_manager()->get_component<EnemyComponent>(*e);
             ec->last_bullet += delta_time;
             ec->first_throw_delay -= delta_time;
-            if (ec->last_bullet > DURATION_THROWING)
-                ec->_is_throwing = false;
 
             if (ec->last_bullet >= MIN_TIME_BETWEEN_BULLET
                 && _rands.get_uniform_real("bullet_probability") < BULLET_PROBABILITY
                 && ec->first_throw_delay <= 0.0f)
             {
                 ec->last_bullet = 0.0f;
-                ec->_is_throwing = true;
+
                 //This is the spawn bullet logic
-                //auto s = std::make_shared<Mage::Sprite>(_enemy_sprites["snowball"].get() );
-
-                _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["snowball"].get());
-                auto s = _enemy_instances[e->get_id()].get();
-
+                auto s = _enemy_sprites["snowball"].get();
                 auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
                 auto eb = _game->get_entity_manager()->add_entity(Galaga::EntityType::Bullet);
                 _game->get_component_manager()->add_component<SpriteComponent>(*eb, { .sprite = s });
@@ -224,51 +224,9 @@ namespace Galaga
         }
     }
 
-    void EnemySpawner::update_enemy_sprites()
-    {
-        Mage::EntityList enemy_list = _game->get_entity_manager()->get_all_entities_by_type(Galaga::EntityType::Enemy);
-        for (auto e : enemy_list)
-        {
-
-            auto ec = _game->get_component_manager()->get_component<EnemyComponent>(*e);
-            auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*e);
-            auto s = _game->get_component_manager()->get_component<SpriteComponent>(*e);
-            auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
-            auto b = _game->get_component_manager()->get_component<BoundingBoxComponent>(*e);
-
-            auto _moving = (std::abs(r->velocity.x) > 0.1f || std::abs(r->velocity.y) > 0.1f);
-            
-            if (ec->_is_throwing)
-            {
-                _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinThrow"].get());
-                auto sprite = _enemy_instances[e->get_id()].get();
-                s->sprite = sprite;
-            }
-            else // if (_moving)
-            {
-                _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinWalk"].get());
-                auto sprite = _enemy_instances[e->get_id()].get();
-                s->sprite = sprite;
-            }
-        }
-    }
-
     void EnemySpawner::update(Mage::ComponentManager& componentManager, float delta_time)
     {
-        Mage::EntityList enemy_list = _game->get_entity_manager()->get_all_entities_by_type(Galaga::EntityType::Enemy);
         shoot(delta_time);
-        if (enemy_list.size() == 0)
-            spawn();
-        update_enemy_sprites();
-
-        for (auto& e : enemy_list)
-        {
-            if (e->is_destroyed())
-            {
-                //_enemy_instances.erase(e->get_id());
-                continue;
-            }
-        }
     }
 
     void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
