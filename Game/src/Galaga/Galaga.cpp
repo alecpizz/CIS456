@@ -40,6 +40,9 @@ namespace Galaga
         _enemy_spawning_system = std::make_unique<EnemySpawner>(this);
         _lifetime_system = std::make_unique<LifetimeSystem>();
 		_score_system = std::make_unique<ScoreSystem>(this);
+        _controller = std::make_unique<Mage::Controller>(0);
+        LOG_INFO("Controller created for controller index 0; result: ", _controller.get());
+        LOG_INFO("Controller has rumble: %d", _controller->has_rumble());
 
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
         get_system_manager()->register_system<RigidBody2DComponent, Transform2DComponent>(*_movement_system);

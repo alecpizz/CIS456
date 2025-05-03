@@ -28,7 +28,6 @@ namespace Galaga
         uint32_t _rows, _cols;
         std::map<std::string, std::shared_ptr<Mage::Sprite> > _enemy_sprites;
         std::map<uint64_t, std::unique_ptr<Mage::Sprite>> _enemy_instances;
-        
 
         RandomWrapper _rands;
 

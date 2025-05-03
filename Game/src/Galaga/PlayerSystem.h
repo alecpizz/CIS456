@@ -48,9 +48,15 @@ namespace Galaga
         uint8_t _wasd_states = 0;
         float _controller_player_movement_x_axis = 0.0f;
         bool _shooting = false;
+        bool _is_down = false;
+        bool _invincible = false;
+        float _time_down = 0.0f;
         float _last_shot = 0.0f;
+        float _time_invincible = 0.0f;
 
         void spawn();
+
+        void death();
 
         void shoot();
 
