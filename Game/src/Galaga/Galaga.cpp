@@ -54,6 +54,7 @@ namespace Galaga
 
         _player_system->initialize();
         _enemy_spawning_system->initialize();
+        _score_system->initialize();
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
         // basic wall for testing --> The Bottom
