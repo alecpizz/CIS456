@@ -53,7 +53,9 @@ add_library(
  "src/Mage/Scene/SystemList.cpp"
  "src/Mage/Core/Exception.cpp"
  "src/Mage/IO/AudioManager.h"
- "src/Mage/IO/AudioManager.cpp")
+ "src/Mage/IO/AudioManager.cpp"
+ "src/Mage/Renderer/SnowRenderer.h"
+ "src/Mage/Renderer/SnowRenderer.cpp")
 
 target_include_directories(
  "Mage" PUBLIC

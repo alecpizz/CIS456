@@ -89,6 +89,7 @@ namespace Galaga
             	kill_enemy(bullet, other);
             }
         });
+        _game->get_audio_manager()->play_sound("player_shoot");
     }
 
     void PlayerSystem::create_player_entity()
