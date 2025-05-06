@@ -36,6 +36,7 @@ namespace Galaga
         _player_sprites["player_throw"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanThrow.png", 4, 0.1f);
         _player_sprites["player_cooldown"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanCooldown.png", 4, 0.15f);
         _player_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
+        _player_sprites["snowball_hit"] = std::make_shared<Mage::Sprite>("res/sprites/snowballHit.png", 5, 0.15f);
         _player_sprites["explosion"] = std::make_shared<Mage::Sprite>("res/sprites/explosion.png", 17, 0.08f);
 
         spawn();
@@ -213,10 +214,19 @@ namespace Galaga
             return;
         }
 
-        bullet->destroy();
+        // Set "poof" sprite for snowball, and then automatically delete snowball
+        auto snowball_vel = _game->get_component_manager()->get_component<RigidBody2DComponent>(*bullet);
+        snowball_vel->velocity = { 0.0f, 0.0f };
+        auto snowball_sprite = _game->get_component_manager()->get_component<SpriteComponent>(*bullet);
+        snowball_sprite->sprite = _player_sprites["snowball_hit"].get();
+        auto snowball_life = _game->get_component_manager()->get_component<LifetimeComponent>(*bullet);
+        snowball_life->remaining = 0.5;
+        // TODO: These 2 lines are dumb fixes! Please find a better way!
+        auto snowball_pos = _game->get_component_manager()->get_component<Transform2DComponent>(*bullet);
+        snowball_pos->scale = { 1.0f, 1.0f };
+
         other->destroy();
         _game->get_audio_manager()->play_sound("enemy_death");
-        //TODO: kill count
 
     	auto score = GPEC(ScoreComponent);
         score->current += 100;
