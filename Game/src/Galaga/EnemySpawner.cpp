@@ -317,13 +317,13 @@ namespace Galaga
 
     void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
     {
-        if (other->get_type() != Galaga::EntityType::Player)
-        {
-            return;
-        }
-
-        bullet->destroy();
-        other->destroy();
+        // if (other->get_type() != Galaga::EntityType::Player)
+        // {
+        //     return;
+        // }
+        //
+        // bullet->destroy();
+        // other->destroy();
         //TODO: kill count
     }
 

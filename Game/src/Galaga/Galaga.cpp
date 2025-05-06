@@ -87,203 +87,128 @@ namespace Galaga
 
 
 
-        //Newer Bottom Wall of Ice
-        for (size_t x = 0; x < 3334;)
+        // //Newer Bottom Wall of Ice
+        // for (size_t x = 0; x < 3334;)
+        // {
+        //     auto ps = static_cast<size_t>(1);
+        //
+        //     for (auto i = 0; i < ps; i++)
+        //     {
+        //         auto sprite = _game_sprites["iceBlock"].get();
+        //         if (i > 0 && ps > 1 && i < ps - 1)
+        //         {
+        //             sprite = _game_sprites["iceBlock"].get();
+        //         }
+        //         else if (i == 0 && ps > 1)
+        //         {
+        //             sprite = _game_sprites["iceBlock"].get();
+        //         }
+        //         else if (ps > 1)
+        //         {
+        //             sprite = _game_sprites["iceBlock"].get();
+        //         }
+        //
+        //
+        //         auto e = get_entity_manager()->add_entity(EntityType::Wall);
+        //         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+        //                                                                          .center = glm::vec2(
+        //                                                                              sprite->get_width() / 2.0f,
+        //                                                                              sprite->get_height() / 2.0f),
+        //                                                                          .half_size = glm::vec2(
+        //                                                                              sprite->get_width() / 2.0f,
+        //                                                                              sprite->get_height() / 2.0f)
+        //             });
+        //         get_component_manager()->add_component<Transform2DComponent>(*e,
+        //             {
+        //                 .translation = glm::vec2(x, -115.0f),
+        //                 .scale = {0.5f, 0.5f},
+        //             });
+        //         get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
+        //         x += sprite->get_width() * 0.5f;
+        //     }
+        //
+        //     x += static_cast<size_t>(1);
+        // }
+
+        for (size_t i = 0; i < 6; i++)
         {
-            auto ps = static_cast<size_t>(1);
-
-            for (auto i = 0; i < ps; i++)
-            {
-                auto sprite = _game_sprites["iceBlock"].get();
-                if (i > 0 && ps > 1 && i < ps - 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (i == 0 && ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-
-
-                auto e = get_entity_manager()->add_entity(EntityType::Wall);
-                get_component_manager()->add_component<BoundingBoxComponent>(*e, {
-                                                                                 .center = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f),
-                                                                                 .half_size = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f)
-                    });
-                get_component_manager()->add_component<Transform2DComponent>(*e,
-                    {
-                        .translation = glm::vec2(x, -115.0f),
-                        .scale = {0.5f, 0.5f},
-                    });
-                get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
-                x += sprite->get_width() * 0.5f;
-            }
-
-            x += static_cast<size_t>(1);
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(i * sprite->get_width() * 0.5f, -115.0f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
         }
 
 
-
-
-        //Newer Top Wall of Ice
-        for (size_t x = 0; x < 3334;)
+        for (size_t i = 0; i < 6; i++)
         {
-            auto ps = static_cast<size_t>(1);
-
-            for (auto i = 0; i < ps; i++)
-            {
-                auto sprite = _game_sprites["iceBlock"].get();
-                if (i > 0 && ps > 1 && i < ps - 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (i == 0 && ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-
-
-                auto e = get_entity_manager()->add_entity(EntityType::Wall);
-                get_component_manager()->add_component<BoundingBoxComponent>(*e, {
-                                                                                 .center = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f),
-                                                                                 .half_size = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f)
-                    });
-                get_component_manager()->add_component<Transform2DComponent>(*e,
-                    {
-                        .translation = glm::vec2(x, 590.0f),
-                        .scale = {0.5f, 0.5f},
-                    });
-                get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
-                x += sprite->get_width() * 0.5f;
-            }
-
-            x += static_cast<size_t>(1);
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(i * sprite->get_width() * 0.5f, 590.0f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
         }
 
-
-
-
-        //Newer Left Wall of Ice
-        for (size_t x = 0; x < 3334;)
+        //left wall
+        for (size_t i = 0; i < 6; i++)
         {
-            auto ps = static_cast<size_t>(1);
-
-            for (auto i = 0; i < ps; i++)
-            {
-                auto sprite = _game_sprites["iceBlock"].get();
-                if (i > 0 && ps > 1 && i < ps - 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (i == 0 && ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-
-
-                auto e = get_entity_manager()->add_entity(EntityType::Wall);
-                get_component_manager()->add_component<BoundingBoxComponent>(*e, {
-                                                                                 .center = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f),
-                                                                                 .half_size = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f)
-                    });
-                get_component_manager()->add_component<Transform2DComponent>(*e,
-                    {
-                        .translation = glm::vec2(-118.0f, x),
-                        .scale = {0.5f, 0.5f},
-                    });
-                get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
-                x += sprite->get_height() * 0.5f;
-            }
-
-            x += static_cast<size_t>(1);
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(-118.0f,
+                                                                                 i * sprite->get_height() * 0.5f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
         }
 
-
-
-        //Newer Right Wall of Ice
-        for (size_t x = 0; x < 3334;)
+        for (size_t i = 0; i < 6; i++)
         {
-            auto ps = static_cast<size_t>(1);
-
-            for (auto i = 0; i < ps; i++)
-            {
-                auto sprite = _game_sprites["iceBlock"].get();
-                if (i > 0 && ps > 1 && i < ps - 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (i == 0 && ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-                else if (ps > 1)
-                {
-                    sprite = _game_sprites["iceBlock"].get();
-                }
-
-
-                auto e = get_entity_manager()->add_entity(EntityType::Wall);
-                get_component_manager()->add_component<BoundingBoxComponent>(*e, {
-                                                                                 .center = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f),
-                                                                                 .half_size = glm::vec2(
-                                                                                     sprite->get_width() / 2.0f,
-                                                                                     sprite->get_height() / 2.0f)
-                    });
-                get_component_manager()->add_component<Transform2DComponent>(*e,
-                    {
-                        .translation = glm::vec2(790.0f, x),
-                        .scale = {0.5f, 0.5f},
-                    });
-                get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
-                x += sprite->get_height() * 0.5f;
-            }
-
-            x += static_cast<size_t>(1);
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(790.0f,
+                                                                                 i * sprite->get_height() * 0.5f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         //The Bottom
@@ -293,10 +218,10 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*e, { .scale = {2000.0f, 10.0f} });
-        get_component_manager()->add_component<ColorComponent>(*e, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*e, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
         //get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
 
         
@@ -311,10 +236,10 @@ namespace Galaga
             .translation = glm::vec2(0.0f, static_cast<float>(get_window()->get_height()) - 10.0f  ),
             .scale = {2000.0f, 10.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*top_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*top_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
 
@@ -328,10 +253,10 @@ namespace Galaga
             .translation = glm::vec2(0.0f, static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f,
             .scale = {2000.0f, 10.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*divider_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*divider_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
         //Left Wall
@@ -344,10 +269,10 @@ namespace Galaga
             .translation = glm::vec2(0.0f, 0.0f),
             .scale = {10.0f, 2000.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*left_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*left_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
 
@@ -361,10 +286,10 @@ namespace Galaga
             .translation = glm::vec2(static_cast<float>(get_window()->get_width()) - 10, 0.0f),
             .scale = {10.0f, 2000.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*right_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*right_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
     }
