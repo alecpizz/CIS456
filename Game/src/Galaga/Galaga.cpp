@@ -41,6 +41,9 @@ namespace Galaga
         _lifetime_system = std::make_unique<LifetimeSystem>();
         _background_sprite = std::make_unique<Mage::Sprite>("res/sprites/bg.png", 1, 0.0f);
 		_score_system = std::make_unique<ScoreSystem>(this);
+        _controller = std::make_unique<Mage::Controller>(0);
+        LOG_INFO("Controller created for controller index 0; result: ", _controller.get());
+        LOG_INFO("Controller has rumble: %d", _controller->has_rumble());
 
         get_system_manager()->register_system<SpriteComponent, Transform2DComponent>(*_sprite_rendering_system);
         get_system_manager()->register_system<Transform2DComponent, ColorComponent>(*_shape_rendering_system);
@@ -77,7 +80,7 @@ namespace Galaga
         get_audio_manager()->play_sound("game_music");
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
-        //The Bottom
+        // basic wall for testing --> The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);
         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
                                                                          .center = glm::vec2(0.5f, 0.5f),

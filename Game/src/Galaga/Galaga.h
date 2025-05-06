@@ -39,6 +39,7 @@ namespace Galaga
         std::unique_ptr<CollisionSystem> _collision_system = nullptr;
         std::unique_ptr<Mage::Sprite> _background_sprite = nullptr;
 		std::unique_ptr<ScoreSystem> _score_system = nullptr;
+        std::unique_ptr<Mage::Controller> _controller = nullptr;
 
         void on_app_closing() override;
     };
