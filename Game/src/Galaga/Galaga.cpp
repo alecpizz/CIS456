@@ -68,6 +68,7 @@ namespace Galaga
 
         _player_system->initialize();
         _enemy_spawning_system->initialize();
+        _score_system->initialize();
 
         get_audio_manager()->set_mixer_group_volume("music", 0.05f);
         get_audio_manager()->set_mixer_group_volume("effects", 1.0f);
@@ -80,6 +81,91 @@ namespace Galaga
         get_audio_manager()->play_sound("game_music");
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
+        _game_sprites["iceBlock"] = std::make_shared<Mage::Sprite>("res/sprites/iceBlock.png", 1, 0.0f);
+        auto sprite = _game_sprites["iceBlock"].get();
+
+        const size_t num_walls = 7;
+        for (size_t i = 0; i < num_walls; i++)
+        {
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(i * sprite->get_width() * 0.5f, -115.0f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
+        }
+
+
+        for (size_t i = 0; i < num_walls; i++)
+        {
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(i * sprite->get_width() * 0.5f, 590.0f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
+        }
+
+        //left wall
+        for (size_t i = 0; i < num_walls; i++)
+        {
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(-118.0f,
+                                                                                 i * sprite->get_height() * 0.5f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
+        }
+
+        for (size_t i = 0; i < num_walls; i++)
+        {
+            auto e = get_entity_manager()->add_entity(EntityType::Wall);
+            get_component_manager()->add_component<BoundingBoxComponent>(*e, {
+                                                                             .center = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f),
+                                                                             .half_size = glm::vec2(
+                                                                                 sprite->get_width() / 2.0f,
+                                                                                 sprite->get_height() / 2.0f)
+                                                                         });
+            get_component_manager()->add_component<Transform2DComponent>(*e,
+                                                                         {
+                                                                             .translation = glm::vec2(790.0f,
+                                                                                 i * sprite->get_height() * 0.5f),
+                                                                             .scale = {0.5f, 0.5f},
+                                                                         });
+            get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
+        }
+
+
         //The Bottom
         auto e = get_entity_manager()->add_entity(EntityType::Wall);
         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
@@ -87,11 +173,11 @@ namespace Galaga
                                                                          .half_size = glm::vec2(0.5f, 0.5f)
             });
         get_component_manager()->add_component<Transform2DComponent>(*e, { .scale = {2000.0f, 10.0f} });
-        get_component_manager()->add_component<ColorComponent>(*e, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
-
+        // get_component_manager()->add_component<ColorComponent>(*e, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
+        //get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
 
         
         // Fortnite Boxing
@@ -105,10 +191,10 @@ namespace Galaga
             .translation = glm::vec2(0.0f, static_cast<float>(get_window()->get_height()) - 10.0f  ),
             .scale = {2000.0f, 10.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*top_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*top_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
 
@@ -122,10 +208,10 @@ namespace Galaga
             .translation = glm::vec2(0.0f, static_cast<float>(get_window()->get_height()) - 10.0f) / 2.0f,
             .scale = {2000.0f, 10.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*divider_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*divider_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
         //Left Wall
@@ -138,10 +224,10 @@ namespace Galaga
             .translation = glm::vec2(0.0f, 0.0f),
             .scale = {10.0f, 2000.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*left_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*left_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
 
@@ -155,10 +241,10 @@ namespace Galaga
             .translation = glm::vec2(static_cast<float>(get_window()->get_width()) - 10, 0.0f),
             .scale = {10.0f, 2000.0f}
             });
-        get_component_manager()->add_component<ColorComponent>(*right_wall, {
-                                                                   .color =
-                                                                   Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
-            });
+        // get_component_manager()->add_component<ColorComponent>(*right_wall, {
+        //                                                            .color =
+        //                                                            Mage::Color::custom(0.1f, 0.7f, 0.1f, 0.7f)
+        //     });
 
 
     }
