@@ -81,57 +81,11 @@ namespace Galaga
         get_audio_manager()->play_sound("game_music");
 		_score_system->set_player_entity(_player_system->get_player_entity());
 
-
-
         _game_sprites["iceBlock"] = std::make_shared<Mage::Sprite>("res/sprites/iceBlock.png", 1, 0.0f);
         auto sprite = _game_sprites["iceBlock"].get();
 
-
-
-        // //Newer Bottom Wall of Ice
-        // for (size_t x = 0; x < 3334;)
-        // {
-        //     auto ps = static_cast<size_t>(1);
-        //
-        //     for (auto i = 0; i < ps; i++)
-        //     {
-        //         auto sprite = _game_sprites["iceBlock"].get();
-        //         if (i > 0 && ps > 1 && i < ps - 1)
-        //         {
-        //             sprite = _game_sprites["iceBlock"].get();
-        //         }
-        //         else if (i == 0 && ps > 1)
-        //         {
-        //             sprite = _game_sprites["iceBlock"].get();
-        //         }
-        //         else if (ps > 1)
-        //         {
-        //             sprite = _game_sprites["iceBlock"].get();
-        //         }
-        //
-        //
-        //         auto e = get_entity_manager()->add_entity(EntityType::Wall);
-        //         get_component_manager()->add_component<BoundingBoxComponent>(*e, {
-        //                                                                          .center = glm::vec2(
-        //                                                                              sprite->get_width() / 2.0f,
-        //                                                                              sprite->get_height() / 2.0f),
-        //                                                                          .half_size = glm::vec2(
-        //                                                                              sprite->get_width() / 2.0f,
-        //                                                                              sprite->get_height() / 2.0f)
-        //             });
-        //         get_component_manager()->add_component<Transform2DComponent>(*e,
-        //             {
-        //                 .translation = glm::vec2(x, -115.0f),
-        //                 .scale = {0.5f, 0.5f},
-        //             });
-        //         get_component_manager()->add_component<SpriteComponent>(*e, { .sprite = sprite });
-        //         x += sprite->get_width() * 0.5f;
-        //     }
-        //
-        //     x += static_cast<size_t>(1);
-        // }
-
-        for (size_t i = 0; i < 6; i++)
+        const size_t num_walls = 7;
+        for (size_t i = 0; i < num_walls; i++)
         {
             auto e = get_entity_manager()->add_entity(EntityType::Wall);
             get_component_manager()->add_component<BoundingBoxComponent>(*e, {
@@ -151,7 +105,7 @@ namespace Galaga
         }
 
 
-        for (size_t i = 0; i < 6; i++)
+        for (size_t i = 0; i < num_walls; i++)
         {
             auto e = get_entity_manager()->add_entity(EntityType::Wall);
             get_component_manager()->add_component<BoundingBoxComponent>(*e, {
@@ -171,7 +125,7 @@ namespace Galaga
         }
 
         //left wall
-        for (size_t i = 0; i < 6; i++)
+        for (size_t i = 0; i < num_walls; i++)
         {
             auto e = get_entity_manager()->add_entity(EntityType::Wall);
             get_component_manager()->add_component<BoundingBoxComponent>(*e, {
@@ -191,7 +145,7 @@ namespace Galaga
             get_component_manager()->add_component<SpriteComponent>(*e, {.sprite = sprite});
         }
 
-        for (size_t i = 0; i < 6; i++)
+        for (size_t i = 0; i < num_walls; i++)
         {
             auto e = get_entity_manager()->add_entity(EntityType::Wall);
             get_component_manager()->add_component<BoundingBoxComponent>(*e, {
