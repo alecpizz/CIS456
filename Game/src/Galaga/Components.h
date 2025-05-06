@@ -72,5 +72,6 @@ namespace Galaga
 	struct ScoreComponent
 	{
 		uint32_t current = 0;
+		std::vector<uint32_t> highest = { 0, 0, 0, 0, 0 };
 	};
 }

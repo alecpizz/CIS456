@@ -68,6 +68,7 @@ namespace Galaga
 
         _player_system->initialize();
         _enemy_spawning_system->initialize();
+        _score_system->initialize();
 
         get_audio_manager()->set_mixer_group_volume("music", 0.05f);
         get_audio_manager()->set_mixer_group_volume("effects", 1.0f);
