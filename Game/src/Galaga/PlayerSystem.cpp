@@ -2,7 +2,7 @@
 #include "Galaga.h"
 
 #define VELOCITY_PLAYER 500.0f
-#define SCALE_PLAYER 0.25f
+#define SCALE_PLAYER 0.75f
 #define BBOX_CENTER_X_PLAYER 20.0f
 #define BBOX_CENTER_Y_PLAYER 20.0f
 #define BBOX_HALF_WIDTH_PLAYER 20.0f
@@ -32,7 +32,8 @@ namespace Galaga
 
         //create sprite
         _player_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
-        _player_sprites["player_idle"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanPlayer.png", 1, 0.0f);
+        _player_sprites["player_idle"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanWalk.png", 4, 0.15f);
+        _player_sprites["explosion"] = std::make_shared<Mage::Sprite>("res/sprites/explosion.png", 17, 0.08f);
         _player_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
         _player_sprites["explosion"] = std::make_shared<Mage::Sprite>("res/sprites/explosion.png", 17, 0.08f);
 
