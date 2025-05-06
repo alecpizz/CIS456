@@ -6,7 +6,7 @@
 #include "Galaga.h"
 
 #define VELOCITY_ENEMY 50.0f
-#define SCALE_ENEMY 0.15f
+#define SCALE_ENEMY 0.5f
 #define OFFSET_ENEMY_CENTER 24.0f
 #define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
 #define BBOX_LEFT_FACING_CENTER_X_ENEMY 77.0f
@@ -66,9 +66,9 @@ namespace Galaga
             height++;
         }
         float buffer_x = 1.0f;
-        float buffer_y = 1.0f;
-        float enemy_width = 60;
-        float enemy_height = 60;
+        float buffer_y = 0.5f;
+        float enemy_width = 128;
+        float enemy_height = 80;
         glm::vec2 origin = glm::vec2(_game->get_window()->get_width() / 2, _game->get_window()->get_height() - _game->get_window()->get_height()/4);
         float x_first = origin.x - (width * enemy_width / 2) - ((width - 1) * buffer_x / 2);
         float y_first = origin.y - (height * enemy_height / 2) - ((height - 1) * buffer_y / 2);
@@ -80,7 +80,7 @@ namespace Galaga
             uint32_t x = i % width;
             uint32_t y = i / width;
             float xPos = x_first + (x * (enemy_width * buffer_x));
-            float yPos = y_first + (y * (enemy_height * buffer_y));
+            float yPos = y_first + (y * (enemy_height * buffer_y)) + 100;
             glm::vec2 pos = glm::vec2(xPos, yPos);
 
             create_enemy_entity(pos);
@@ -91,7 +91,7 @@ namespace Galaga
     void EnemySpawner::create_enemy_entity(glm::vec2 pos)
     {
         _enemy_entity = _game->get_entity_manager()->add_entity(Galaga::EntityType::Enemy);
-        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguin"].get());
+        _enemy_instances[_enemy_entity->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinWalk"].get());
         auto sprite = _enemy_instances[_enemy_entity->get_id()].get();
         _game->get_component_manager()->add_component(*_enemy_entity, EnemyComponent
             {
@@ -198,7 +198,7 @@ namespace Galaga
                 ec->last_bullet = 0.0f;
 
                 //This is the spawn bullet logic
-                auto s = _enemy_sprites["snowball"].get();
+                // auto s = _enemy_sprites["snowball"].get();
                 ec->_is_throwing = true;
                 // set to throwing
                 update_enemy_sprites(e);
@@ -300,6 +300,7 @@ namespace Galaga
 
     void EnemySpawner::update(Mage::ComponentManager& componentManager, float delta_time)
     {
+        Mage::EntityList enemy_list = _game->get_entity_manager()->get_all_entities_by_type(Galaga::EntityType::Enemy);
         shoot(delta_time);
         if (enemy_list.size() == 0)
             spawn();
