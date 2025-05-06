@@ -48,6 +48,7 @@ namespace Galaga
     {
         float last_bullet = 3.0f;
         float first_throw_delay = 0.0f;
+        bool _is_throwing = false;
     };
 
     struct BoundingBoxComponent
