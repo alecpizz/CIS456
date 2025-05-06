@@ -238,7 +238,7 @@ namespace Galaga
                     .half_size = {bullet_half_x, bullet_half_y},
                     .on_collided = [&](Mage::Entity* bullet, Mage::Entity* other, const glm::vec2& overlap)
                     {
-                        //kill_player(bullet, other);
+                        kill_player(bullet, other);
                     }
                     });
             }
@@ -317,13 +317,13 @@ namespace Galaga
 
     void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
     {
-        if (other->get_type() != Galaga::EntityType::Player)
-        {
-            return;
-        }
-
-        bullet->destroy();
-        other->destroy();
+        // if (other->get_type() != Galaga::EntityType::Player)
+        // {
+        //     return;
+        // }
+        //
+        // bullet->destroy();
+        // other->destroy();
         //TODO: kill count
     }
 

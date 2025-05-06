@@ -41,6 +41,8 @@ namespace Galaga
 		std::unique_ptr<ScoreSystem> _score_system = nullptr;
         std::unique_ptr<Mage::Controller> _controller = nullptr;
 
+        std::map<std::string, std::shared_ptr<Mage::Sprite> > _game_sprites;
+
         void on_app_closing() override;
     };
 }
