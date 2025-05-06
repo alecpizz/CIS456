@@ -22,6 +22,8 @@
 #define BULLET_X_VELOCITY 150.0f
 #define ROWS 3
 #define COLS 5
+#define DURATION_THROWING       0.60f
+
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
 
@@ -39,7 +41,8 @@ namespace Galaga
     {
         //create sprite
         _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
-        _enemy_sprites["penguin"] = std::make_shared<Mage::Sprite>("res/sprites/penguin.png", 1, 0.0f);
+        _enemy_sprites["penguinWalk"] = std::make_shared<Mage::Sprite>("res/sprites/penguinWalk.png", 2, 0.25f);
+        _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 4, 0.15f);
         _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
         spawn();
     }
@@ -166,6 +169,7 @@ namespace Galaga
                 t->translation.y = t->prev_translation.y;
                 r->velocity.y *= -1.0f;
             }
+            _game->get_audio_manager()->play_sound("enemy_collide");
         }
     }
 
@@ -180,6 +184,12 @@ namespace Galaga
             auto ec = _game->get_component_manager()->get_component<EnemyComponent>(*e);
             ec->last_bullet += delta_time;
             ec->first_throw_delay -= delta_time;
+            if (ec->last_bullet > DURATION_THROWING && ec->_is_throwing)
+            {
+                ec->_is_throwing = false;
+                // set to walking
+                update_enemy_sprites(e);
+            }
 
             if (ec->last_bullet >= MIN_TIME_BETWEEN_BULLET
                 && _rands.get_uniform_real("bullet_probability") < BULLET_PROBABILITY
@@ -189,8 +199,19 @@ namespace Galaga
 
                 //This is the spawn bullet logic
                 auto s = _enemy_sprites["snowball"].get();
+                ec->_is_throwing = true;
+                // set to throwing
+                update_enemy_sprites(e);
+                //This is the spawn bullet logic
+                //auto s = std::make_shared<Mage::Sprite>(_enemy_sprites["snowball"].get() );
+
+                
                 auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
                 auto eb = _game->get_entity_manager()->add_entity(Galaga::EntityType::Bullet);
+
+                _enemy_instances[eb->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["snowball"].get());
+                auto s = _enemy_instances[eb->get_id()].get();
+
                 _game->get_component_manager()->add_component<SpriteComponent>(*eb, { .sprite = s });
                 /*_game->get_component_manager()->add_component<ColorComponent>(*eb,
                     {
@@ -224,9 +245,73 @@ namespace Galaga
         }
     }
 
+    void EnemySpawner::update_enemy_sprites(Mage::Entity* e)
+    {
+        auto ec = _game->get_component_manager()->get_component<EnemyComponent>(*e);
+        auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*e);
+        auto s = _game->get_component_manager()->get_component<SpriteComponent>(*e);
+        auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
+        auto b = _game->get_component_manager()->get_component<BoundingBoxComponent>(*e);
+
+        auto _moving = (std::abs(r->velocity.x) > 0.1f || std::abs(r->velocity.y) > 0.1f);
+
+        if (ec->_is_throwing)
+        {
+            _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinThrow"].get());
+            auto sprite = _enemy_instances[e->get_id()].get();
+            s->sprite = sprite;
+        }
+        else // if (_moving)
+        {
+            _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinWalk"].get());
+            auto sprite = _enemy_instances[e->get_id()].get();
+            s->sprite = sprite;
+        }
+    }
+
+    void EnemySpawner::update_enemy_sprites()
+    {
+        Mage::EntityList enemy_list = _game->get_entity_manager()->get_all_entities_by_type(Galaga::EntityType::Enemy);
+        for (auto e : enemy_list)
+        {
+
+            auto ec = _game->get_component_manager()->get_component<EnemyComponent>(*e);
+            auto r = _game->get_component_manager()->get_component<RigidBody2DComponent>(*e);
+            auto s = _game->get_component_manager()->get_component<SpriteComponent>(*e);
+            auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*e);
+            auto b = _game->get_component_manager()->get_component<BoundingBoxComponent>(*e);
+
+            auto _moving = (std::abs(r->velocity.x) > 0.1f || std::abs(r->velocity.y) > 0.1f);
+            
+            if (ec->_is_throwing)
+            {
+                _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinThrow"].get());
+                auto sprite = _enemy_instances[e->get_id()].get();
+                s->sprite = sprite;
+            }
+            else // if (_moving)
+            {
+                _enemy_instances[e->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["penguinWalk"].get());
+                auto sprite = _enemy_instances[e->get_id()].get();
+                s->sprite = sprite;
+            }
+        }
+    }
+
     void EnemySpawner::update(Mage::ComponentManager& componentManager, float delta_time)
     {
         shoot(delta_time);
+        if (enemy_list.size() == 0)
+            spawn();
+
+        for (auto& e : enemy_list)
+        {
+            if (e->is_destroyed())
+            {
+                _enemy_instances.erase(e->get_id());
+                continue;
+            }
+        }
     }
 
     void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
