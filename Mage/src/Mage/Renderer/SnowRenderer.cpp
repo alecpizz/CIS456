@@ -45,7 +45,7 @@ namespace Mage
                         q += vec2(q.y*(WIDTH*mod(f*7.238917,1.)-WIDTH*.5),SPEED*time/(1.+f*DEPTH*.03));
                         vec3 n = vec3(floor(q),31.189+f);
                         vec3 m = floor(n)*.00001 + fract(n);
-                        vec3 mp = (31415.9+m)/fract(mul(m,p));
+                        vec3 mp = (31415.9+m)/fract(m*p);
                         vec3 r = fract(mp);
                         vec2 s = abs(mod(q,1.)-0.5+0.9*r.xy-0.45);
                         s += 0.01*abs(2.*fract(10.*q.yx)-1.0);

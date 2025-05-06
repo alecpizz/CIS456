@@ -59,6 +59,7 @@ namespace Mage {
                 glGetShaderInfoLog( the_shader, 1024, nullptr, error_log ) ;
                 std::stringstream message ;
                 message << "Error compiling shader (shader type " << shader_type << "): " << error_log ;
+                LOG_E_ERROR("This is the error %s", message.str().c_str());
                 throw Exception( message.str().c_str() ) ;
             }
 
