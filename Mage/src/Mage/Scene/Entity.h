@@ -39,7 +39,7 @@ namespace Mage
 
         void destroy()
         {
-            _destroyed =true;
+            _destroyed = true;
         }
 
     private:
