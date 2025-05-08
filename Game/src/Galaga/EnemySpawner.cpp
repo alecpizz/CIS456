@@ -23,7 +23,7 @@
 #define BULLET_X_VELOCITY 150.0f
 #define ROWS 3
 #define COLS 5
-#define DURATION_THROWING       0.60f
+#define DURATION_THROWING       0.75f
 
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
@@ -43,7 +43,7 @@ namespace Galaga
         //create sprite
         _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
         _enemy_sprites["penguinWalk"] = std::make_shared<Mage::Sprite>("res/sprites/penguinWalk.png", 2, 0.25f);
-        _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 4, 0.15f);
+        _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 5, 0.15f);
         _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
         _enemy_sprites["snowballHit"] = std::make_shared<Mage::Sprite>("res/sprites/snowballHit.png", 5, 0.05f);
         spawn();
