@@ -312,7 +312,7 @@ namespace Galaga
     {
         if (other_entity->get_type() == Galaga::EntityType::Bullet && !_is_down && !_invincible)
         {
-            other_entity->destroy();
+            //dont destroy bullet, to play their animation they get destroyed in enemy spawner
             death();
             return;
         }
