@@ -2,7 +2,7 @@
 #include "Galaga.h"
 
 #define VELOCITY_PLAYER 500.0f
-#define SCALE_PLAYER 0.25f
+#define SCALE_PLAYER 0.8f
 #define BBOX_CENTER_X_PLAYER 20.0f
 #define BBOX_CENTER_Y_PLAYER 20.0f
 #define BBOX_HALF_WIDTH_PLAYER 20.0f
@@ -32,8 +32,11 @@ namespace Galaga
 
         //create sprite
         _player_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
-        _player_sprites["player_idle"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanPlayer.png", 1, 0.0f);
+        _player_sprites["player_idle"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanWalk.png", 4, 0.15f);
+        _player_sprites["player_throw"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanThrow.png", 4, 0.1f);
+        _player_sprites["player_cooldown"] = std::make_shared<Mage::Sprite>("res/sprites/snowmanCooldown.png", 4, 0.15f);
         _player_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
+        _player_sprites["snowball_hit"] = std::make_shared<Mage::Sprite>("res/sprites/snowballHit.png", 5, 0.15f);
         _player_sprites["explosion"] = std::make_shared<Mage::Sprite>("res/sprites/explosion.png", 17, 0.08f);
 
         spawn();
@@ -72,7 +75,7 @@ namespace Galaga
         });
         _game->get_component_manager()->add_component<Transform2DComponent>(*e,
         {
-        	.translation = {t->translation.x + b->center.x, t->translation.y + 1.5f * b->center.y},
+        	.translation = {t->translation.x + b->center.x, t->translation.y + 2.0f * b->center.y},
         	.scale = {SCALE_BULLET, SCALE_BULLET}
         });
         _game->get_component_manager()->add_component<LifetimeComponent>(*e,
@@ -132,8 +135,8 @@ namespace Galaga
         	(_game->get_window()->get_width() - 20.0f * 0.25f) / 2.0f,
         	20.0f
         };
-        auto player_half_x = static_cast<float>(sprite->get_width()) * SCALE_PLAYER;
-        auto player_half_y = static_cast<float>(sprite->get_height()) * SCALE_PLAYER;
+        auto player_half_x = static_cast<float>(sprite->get_width()) * 0.5 * SCALE_PLAYER;
+        auto player_half_y = static_cast<float>(sprite->get_height()) * 0.5 * SCALE_PLAYER;
         b->center = { player_half_x, player_half_y };
         b->half_size = { player_half_x, player_half_y };
         r->velocity = glm::vec2(0.0f, 0.0f);
@@ -190,6 +193,14 @@ namespace Galaga
         {
             sprite->sprite = _player_sprites["explosion"].get();
         }
+        else if (_shooting)
+        {
+            sprite->sprite = _player_sprites["player_throw"].get();
+        }
+        else if (_invincible)
+        {
+            sprite->sprite = _player_sprites["player_cooldown"].get();
+        }
         else
         {
             sprite->sprite = _player_sprites["player_idle"].get();
@@ -203,10 +214,19 @@ namespace Galaga
             return;
         }
 
-        bullet->destroy();
+        // Set "poof" sprite for snowball, and then automatically delete snowball
+        auto snowball_vel = _game->get_component_manager()->get_component<RigidBody2DComponent>(*bullet);
+        snowball_vel->velocity = { 0.0f, 0.0f };
+        auto snowball_sprite = _game->get_component_manager()->get_component<SpriteComponent>(*bullet);
+        snowball_sprite->sprite = _player_sprites["snowball_hit"].get();
+        auto snowball_life = _game->get_component_manager()->get_component<LifetimeComponent>(*bullet);
+        snowball_life->remaining = 0.5;
+        // TODO: These 2 lines are dumb fixes! Please find a better way!
+        auto snowball_pos = _game->get_component_manager()->get_component<Transform2DComponent>(*bullet);
+        snowball_pos->scale = { 1.0f, 1.0f };
+
         other->destroy();
         _game->get_audio_manager()->play_sound("enemy_death");
-        //TODO: kill count
 
     	auto score = GPEC(ScoreComponent);
         score->current += 100;
