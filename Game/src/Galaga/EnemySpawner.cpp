@@ -6,6 +6,7 @@
 #include "Galaga.h"
 
 #define VELOCITY_ENEMY 50.0f
+#define BULLET_BREAK_DURATION 0.25f
 #define SCALE_ENEMY 0.5f
 #define OFFSET_ENEMY_CENTER 24.0f
 #define BBOX_RIGHT_FACING_CENTER_X_ENEMY 0.5f
@@ -22,7 +23,7 @@
 #define BULLET_X_VELOCITY 150.0f
 #define ROWS 3
 #define COLS 5
-#define DURATION_THROWING       0.60f
+#define DURATION_THROWING       0.75f
 
 
 #define GPEC(T) _game->get_component_manager()->get_component<T>(*_enemy_entity)
@@ -42,8 +43,9 @@ namespace Galaga
         //create sprite
         _enemy_sprites = std::map<std::string, std::shared_ptr<Mage::Sprite> >();
         _enemy_sprites["penguinWalk"] = std::make_shared<Mage::Sprite>("res/sprites/penguinWalk.png", 2, 0.25f);
-        _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 4, 0.15f);
+        _enemy_sprites["penguinThrow"] = std::make_shared<Mage::Sprite>("res/sprites/penguinThrow.png", 5, 0.15f);
         _enemy_sprites["snowball"] = std::make_shared<Mage::Sprite>("res/sprites/snowball.png", 1, 0.0f);
+        _enemy_sprites["snowballHit"] = std::make_shared<Mage::Sprite>("res/sprites/snowballHit.png", 5, 0.05f);
         spawn();
     }
 
@@ -238,9 +240,10 @@ namespace Galaga
                     .half_size = {bullet_half_x, bullet_half_y},
                     .on_collided = [&](Mage::Entity* bullet, Mage::Entity* other, const glm::vec2& overlap)
                     {
-                        kill_player(bullet, other);
+                        if( other->get_type() == Galaga::EntityType::Player)
+                            hit_player(bullet, other);
                     }
-                    });
+                });
             }
         }
     }
@@ -315,16 +318,23 @@ namespace Galaga
         }
     }
 
-    void EnemySpawner::kill_player(Mage::Entity* bullet, Mage::Entity* other)
+    void EnemySpawner::hit_player(Mage::Entity* bullet, Mage::Entity* other)
     {
-        // if (other->get_type() != Galaga::EntityType::Player)
-        // {
-        //     return;
-        // }
-        //
-        // bullet->destroy();
-        // other->destroy();
-        //TODO: kill count
+        //Run animation for snowball break
+        _enemy_instances[bullet->get_id()] = std::make_unique<Mage::Sprite>(_enemy_sprites["snowballHit"].get());
+        auto s = _enemy_instances[bullet->get_id()].get();
+
+        auto pc = _game->get_component_manager()->get_component<PlayerComponent>(*other);
+
+        auto sprite = _game->get_component_manager()->get_component<SpriteComponent>(*bullet);
+        auto rb = _game->get_component_manager()->get_component<RigidBody2DComponent>(*bullet);
+        auto t = _game->get_component_manager()->get_component<Transform2DComponent>(*bullet);
+        auto l = _game->get_component_manager()->get_component<LifetimeComponent>(*bullet);
+
+        l->remaining = BULLET_BREAK_DURATION;
+        t->scale = { SCALE_BULLET * 4, SCALE_BULLET * 4 };
+        rb->velocity = { 0, VELOCITY_BULLET };
+        sprite->sprite = s;
     }
 
 }
